@@ -847,7 +847,15 @@ gsap.ticker.lagSmoothing(0);
 /* ---------- ciao pattern: ONE data object, triggers write, rAF applies ---------- */
 const data = {
   focus:0, focusTarget:0, spread:1,       // carousel state
-  x:0, y:0, scale:1, opacity:0,
+  x:0, y:0, scale:1, opacity:1,
+  /* rise and exit are SEPARATE channels, each owned by exactly one animation.
+     They used to share `opacity`/`y` with the entrance, and because the exit is a
+     SCRUBBED tween it captured whatever the value happened to be when it was built
+     (0) and wrote that back on every ScrollTrigger.refresh — so a visitor who had
+     already passed the age gate got a permanently invisible stage. One property,
+     one owner, no implicit `from` anywhere. */
+  rise:1,                                  // 0 = below the floor, 1 = in place
+  exit:0,                                  // 0 = on stage, 1 = sunk and gone
   bg:new THREE.Color('#0C0906'),
 };
 const SPACING = .92;
@@ -1216,7 +1224,7 @@ function projTo(x, y, z, out){
 const _a = {x:0,y:0}, _b = {x:0,y:0}, PRJ2 = {x:0,y:0};
 function inkWordmark(){
   if (!wmBox) return;
-  const lit = data.opacity > .05;
+  const lit = data.opacity * (1 - data.exit) > .05;   /* own scope, own computation */
   for (let i = 0; i < wmLetters.length; i++){
     const r = wmBox.rects[i];
     let best = 0, bestIdx = -1;
@@ -1249,7 +1257,10 @@ gsap.ticker.add(() => {
   data.focus += (data.focusTarget - data.focus) * Math.min(1, dt*10);
 
   const idle = Math.sin(t*.44)*.227 + Math.sin(t*.17)*.064;
-  const gy = GROUND_Y + data.y;
+  /* rise and exit fold into the single vertical offset the scene actually uses */
+  const yOff = data.y - 1.5 * ((1 - data.rise) + data.exit);
+  const vis0 = data.opacity * (1 - data.exit);
+  const gy = GROUND_Y + yOff;
   /* collapsing the carousel pushes neighbours OUT past the frame, never through
      the focused can — real objects exit, they do not merge */
   /* Visibility is a function of where the can actually IS on screen, not of which
@@ -1280,7 +1291,7 @@ gsap.ticker.add(() => {
     const s = data.scale * (1 - .1*Math.min(1,Math.abs(rel))*data.spread);
     can.scale.setScalar(s);
     const bob = Math.sin(t*.55 + i*.9)*.012;
-    can.position.set(x, -.57 + data.y + bob, -Math.abs(rel)*.28*data.spread);
+    can.position.set(x, -.57 + yOff + bob, -Math.abs(rel)*.28*data.spread);
     can.traverse(o => { if (o.isMesh) {
       o.material.opacity = vis; o.material.transparent = vis < .999;
       o.castShadow = vis > .6; }});
@@ -1309,13 +1320,13 @@ gsap.ticker.add(() => {
   ground.position.y = gy;
   mirrorClip.constant = gy;
   glow.position.set(data.x, gy + .002, 0);
-  glow.material.opacity = .13 * data.opacity * (data.spread < .5 ? 1.5 : 1);
+  glow.material.opacity = .13 * vis0 * (data.spread < .5 ? 1.5 : 1);
   ptr.cx += (ptr.x - ptr.cx) * Math.min(1, dt*3);
   ptr.cy += (ptr.y - ptr.cy) * Math.min(1, dt*3);
   camera.position.x = ptr.cx * .16;
   camera.position.y = .02 - ptr.cy * .1;
   applyFlavorDOM();
-  stage.style.opacity = data.opacity;
+  stage.style.opacity = vis0;
   composer.render();
   inkWordmark();
   const kl = Math.min(1, dt * 7);
@@ -1337,9 +1348,12 @@ addEventListener('resize', () => {
    gate wipes upward like a lifting door. Sessions that already passed the gate (or
    land mid-page from a refresh) get the quiet fade; on a refresh deep in the page
    the exit scrub owns opacity and nothing may fight it. */
+/* The stage is ON by default. It is never faded in by a tween, so there is no state
+   in which a missed or overridden tween can leave it invisible; before the gate is
+   answered the gate itself covers it. */
 const freshTop = gateShown && scrollY < innerHeight * .5;
 if (freshTop) {
-  data.y = -1.5; data.opacity = 1;   /* below the floor, waiting in the dark */
+  data.rise = 0;                     /* below the floor, waiting in the dark */
   cinematicEnter = () => {
     cinematicEnter = null;
     gsap.timeline()
@@ -1348,16 +1362,12 @@ if (freshTop) {
       .to(gate, {clipPath:'inset(0 0 100% 0)', duration:.95, ease:'expo.inOut',
         onStart(){ gate.style.clipPath = 'inset(0 0 0% 0)'; },
         onComplete(){ gate.classList.add('hide'); }}, .18)
-      .to(data, {y:0, duration:1.7, ease:'expo.out'}, .42)
+      .to(data, {rise:1, duration:1.7, ease:'expo.out'}, .42)
       .to('#gamme h1 .w > span', {y:0, duration:.9, ease:'expo.out', stagger:.08}, .78);
   };
 } else {
-  const tlIn = gsap.timeline({delay:.15})
+  gsap.timeline({delay:.15})
     .to('#gamme h1 .w > span', {y:0, duration:.9, ease:'expo.out', stagger:.08});
-  if (scrollY < innerHeight * 1.5) tlIn.to(data, {opacity:1, duration:.8, ease:'power2.out'}, '-=.5');
-  /* reload deeper in the journey: the stage must simply BE on — no tween — and the
-     profil exit scrub (created after this) owns opacity from there down */
-  else if (scrollY < document.getElementById('profil').offsetTop) data.opacity = 1;
 }
 
 /* ---------- THE journey: one pass, all eight beers, nothing revisited ----------
@@ -1404,8 +1414,8 @@ ScrollTrigger.addEventListener('refresh', () => {
    so scrolling back up raises them right back out. */
 gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%', scrub:.7,
   onEnter(){ tintScene = false; }, onLeaveBack(){ tintScene = true; }}})
-  .to(data, {y:-1.5, ease:'power1.in'}, 0)
-  .to(data, {opacity:0, ease:'none'}, .45)
+  .fromTo(data, {exit:0}, {exit:1, ease:'none'}, 0)   /* explicit from: a scrub must
+      never be allowed to capture an implicit start value */
   .to(data.bg, {r:.030, g:.022, b:.014, ease:'none'}, 0);
 
 /* ---------- one land, eight windows ----------
