@@ -214,12 +214,20 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 #vatn li b{font-family:var(--disp);font-weight:600;font-size:1.3rem;letter-spacing:.02em;text-transform:uppercase}
 #vatn li span{color:#A79A88;font-size:15px}
 #vatn .note{font-size:15px;color:#A79A88}
-#vatn .imgw{aspect-ratio:3/2;background:#141007}
+#vatn .vcans{display:flex;gap:clamp(16px,3vw,44px);justify-content:center;align-items:end}
+#vatn .vcans img{height:clamp(260px,42vh,430px);width:auto;object-fit:contain;
+  filter:drop-shadow(0 30px 50px rgba(0,0,0,.55))}
 @media(max-width:860px){#vatn .split{grid-template-columns:1fr}}
 
 /* ---------- function hall ---------- */
 #salur{padding:15vh 0}
 #salur h2{font-size:clamp(2.2rem,5.4vw,4.2rem);max-width:14ch}
+#salur .halls{display:grid;grid-template-columns:1.4fr .9fr 1.2fr;gap:10px;margin-top:44px}
+#salur .halls figure{overflow:clip;border-radius:14px;aspect-ratio:4/3}
+#salur .halls img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease)}
+#salur .halls figure:hover img{transform:scale(1.05)}
+@media(max-width:860px){#salur .halls{grid-template-columns:1fr 1fr}
+  #salur .halls figure:last-child{grid-column:1/-1}}
 #salur .split{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,72px);margin-top:52px}
 #salur ul{list-style:none;display:grid}
 #salur li{padding:16px 0;border-bottom:1px solid rgba(243,234,219,.12);display:flex;
@@ -253,8 +261,7 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
   z-index:20;opacity:0;border-radius:14px;overflow:hidden;background:#171209;
   border:1px solid rgba(243,234,219,.12);will-change:transform,opacity}
 /* a background image, not an <img>: an empty <img> src counts as a broken image */
-#frettir .peek{background-repeat:no-repeat;background-position:center;
-  background-size:contain;background-origin:content-box;padding:10px}
+#frettir .peek{background-repeat:no-repeat;background-position:center;background-size:cover}
 @media(hover:none),(prefers-reduced-motion:reduce){#frettir .peek{display:none}}
 @media(max-width:640px){#frettir a.item{grid-template-columns:1fr;gap:6px}
   #frettir .go{display:none}}
@@ -308,6 +315,12 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 /* ---------- sermerking ---------- */
 #merki{padding:16vh 0 10vh;min-height:100dvh;display:grid;align-content:center}
 #merki h2{font-size:clamp(2.4rem,6vw,4.6rem);max-width:14ch}
+#merki .clients{margin-top:40px}
+#merki .clab{font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:#7C7060;font-weight:600}
+#merki .crow{display:flex;gap:clamp(14px,2.6vw,40px);align-items:end;margin-top:20px;flex-wrap:wrap}
+#merki .crow img{height:clamp(120px,15vh,168px);width:auto;object-fit:contain;
+  filter:drop-shadow(0 18px 30px rgba(0,0,0,.5));transition:transform .4s var(--ease)}
+#merki .crow img:hover{transform:translateY(-8px)}
 #merki .play{display:grid;grid-template-columns:minmax(300px,1fr) minmax(280px,460px);
   gap:clamp(28px,5vw,70px);align-items:center;margin-top:24px}
 #merki .canhold{position:relative;height:min(64vh,600px)}
@@ -329,6 +342,10 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 #tur h2{font-size:clamp(2.4rem,6vw,4.6rem);max-width:16ch}
 #tur .split{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,5vw,80px);margin-top:56px}
 #tur .brew .imgw{aspect-ratio:3/2;margin-bottom:30px}
+#tur .bottles{display:flex;gap:clamp(14px,2.5vw,34px);align-items:flex-end;margin-top:34px}
+#tur .bottles img{height:clamp(110px,14vh,158px);width:auto;object-fit:contain;
+  filter:drop-shadow(0 16px 26px rgba(0,0,0,.5))}
+#tur .bottles img:last-child{height:clamp(90px,11vh,124px);border-radius:10px}
 #tur ul{list-style:none;display:grid}
 #tur li{padding:18px 0;border-bottom:1px solid rgba(243,234,219,.12);display:flex;justify-content:space-between;gap:20px}
 #tur li span:last-child{color:#A79A88;text-align:right}
@@ -479,7 +496,10 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
       </ul>
       <p class="rv note">Vatnið fæst einnig sérmerkt, alveg eins og bjórinn.</p>
     </div>
-    <figure class="rv"><div class="imgw"><img loading="lazy" src="img/soda.png" alt="Kolsýrt bergvatn frá Ölvisholti í dós"></div></figure>
+    <figure class="rv vcans">
+      <img loading="lazy" src="img/vatn/vatn-plain.png" alt="Kolsýrt íslenskt bergvatn í dós, ómbragðbætt">
+      <img loading="lazy" src="img/vatn/vatn-lime.png" alt="Kolsýrt íslenskt bergvatn í dós með lime">
+    </figure>
   </div>
 </section>
 
@@ -530,6 +550,15 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
   <div class="wrapc">
     <h2>Þitt merki. Okkar bjór.</h2>
     <p class="rv lead">Fyrirtæki, viðburðahaldarar og einstaklingar geta sérmerkt dósir eða flöskur fyrir hvaða tilefni sem er. Stansar eru í boði.</p>
+    <div class="clients rv">
+      <span class="clab">Þeir hafa þegar gert það</span>
+      <div class="crow">
+        <img loading="lazy" src="img/merki/Toyota_Vefur.png" alt="Sérmerkt dós fyrir Toyota Professional">
+        <img loading="lazy" src="img/merki/Ruko_Vefur.png" alt="Sérmerkt dós fyrir Rúko">
+        <img loading="lazy" src="img/merki/Rafport_Vefur.png" alt="Sérmerkt dós fyrir Rafport">
+        <img loading="lazy" src="img/merki/Fiddi_Vefur.png" alt="Sérmerkt dós fyrir Fidda">
+      </div>
+    </div>
     <div class="play">
       <form onsubmit="return false">
         <label for="evt">Skrifaðu tilefnið og sjáðu það á dósinni</label>
@@ -556,7 +585,13 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
           <li><span>Aðgengi að veislusal, sviði, mixer, míkrafón og skjávarpa</span><span>innifalið</span></li>
           <li><span>Lágmarksfjöldi</span><span>15 manns</span></li>
           <li><span>Eigin pinnamatur leyfður</span><span>vægt gjald fyrir matarstell</span></li>
+          <li><span>Bjórinn fæst líka í flöskum og á krana</span><span>í salnum</span></li>
         </ul>
+        <div class="bottles">
+          <img loading="lazy" src="img/flaska-lager.png" alt="Ölvisholt Premium Lager í 330 ml flösku">
+          <img loading="lazy" src="img/flaska-ipa.png" alt="Ölvisholt Session IPA í 330 ml flösku">
+          <img loading="lazy" src="img/kranabjor.webp" alt="Ölvisholt á krana">
+        </div>
       </div>
       <div class="rv">
         <div class="price">5.500 kr<small> á mann</small></div>
@@ -571,6 +606,11 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
 <section id="salur">
   <div class="wrapc">
     <h2>Veislusalur til leigu</h2>
+    <div class="halls rv">
+      <figure><img loading="lazy" src="img/salur/salur1.jpg" alt="Veislusalur Ölvisholts uppsettur með hringborðum"></figure>
+      <figure><img loading="lazy" src="img/salur/veisla.jpg" alt="Barinn í veislusal Ölvisholts með krönum"></figure>
+      <figure><img loading="lazy" src="img/salur/salur3.jpg" alt="Veislusalurinn í dagsbirtu, borð fyrir hóp"></figure>
+    </div>
     <div class="split">
       <div class="rv">
         <ul>
@@ -708,15 +748,18 @@ const SEASON = [
 const ALL = [...BEERS, ...SEASON];
 
 /* their real fréttir, titles/dates/links taken from olvisholt.is/feed (2026-08-08) */
+/* images are each article's own featured image, pulled from the post itself.
+   Ný staðsetning is the exception: their post uses a generic stock warehouse, so it
+   shows the real Grandatröð brewhouse instead. */
 const NEWS = [
-  {t:'Sumarbjórinn Birta',    d:'17. apríl 2025',     u:'https://olvisholt.is/sumarbjorinn-birta/',      img:'cans/olvisholt_birta_33cl.png'},
-  {t:'Kolsýrt vatn',          d:'18. febrúar 2025',   u:'https://olvisholt.is/kolsyrt-vatn/',            img:'img/soda.png'},
-  {t:'Pretzie Októberfest',   d:'6. september 2024',  u:'https://olvisholt.is/pretzie-oktoberfest-bjor/',img:'cans/Pretzie.png'},
-  {t:'Páskabjór',             d:'23. febrúar 2024',   u:'https://olvisholt.is/paskabjor/',               img:'cans/olvisholt_paskabjor_33cl.png'},
-  {t:'Jólabjór 2024',         d:'1. nóvember 2023',   u:'https://olvisholt.is/jolabjor-2024/',           img:'cans/olvisholt_jola_klassik_33cl-2025.png'},
+  {t:'Sumarbjórinn Birta',    d:'17. apríl 2025',     u:'https://olvisholt.is/sumarbjorinn-birta/',      img:'img/news/birta.jpg'},
+  {t:'Kolsýrt vatn',          d:'18. febrúar 2025',   u:'https://olvisholt.is/kolsyrt-vatn/',            img:'img/vatn/vatn-plain.png'},
+  {t:'Pretzie Októberfest',   d:'6. september 2024',  u:'https://olvisholt.is/pretzie-oktoberfest-bjor/',img:'img/news/pretzie.jpg'},
+  {t:'Páskabjór',             d:'23. febrúar 2024',   u:'https://olvisholt.is/paskabjor/',               img:'img/news/paskar.jpg'},
+  {t:'Jólabjór 2024',         d:'1. nóvember 2023',   u:'https://olvisholt.is/jolabjor-2024/',           img:'img/news/jola2024.jpg'},
   {t:'Ný staðsetning',        d:'12. október 2023',   u:'https://olvisholt.is/new-location/',            img:'img/brugg-4330.jpg'},
-  {t:'Jólabjór',              d:'10. október 2023',   u:'https://olvisholt.is/christmas-beer/',          img:'cans/olvisholt_jola_lite_33cl-2025.png'},
-  {t:'Endurmörkun',           d:'10. október 2023',   u:'https://olvisholt.is/rebrand/',                 img:'img/teikning.jpg'},
+  {t:'Jólabjór',              d:'10. október 2023',   u:'https://olvisholt.is/christmas-beer/',          img:'img/news/jola.jpg'},
+  {t:'Endurmörkun',           d:'10. október 2023',   u:'https://olvisholt.is/rebrand/',                 img:'img/news/endurmorkun.jpg'},
 ];
 
 /* no WebGL (old device, exhausted contexts, headless bot) must never mean a broken
