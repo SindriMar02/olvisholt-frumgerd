@@ -1382,6 +1382,15 @@ gsap.ticker.add(() => {
   data.focus += (data.focusTarget - data.focus) * Math.min(1, dt*10);
 
   const idle = Math.sin(t*.44)*.227 + Math.sin(t*.17)*.064;
+  /* A scrub is a CATCH-UP, not a position: flick the wheel hard and the scroll races
+     past while `exit` is still interpolating, which left the fixed stage painting cans
+     over sections far below (the "picture following the page down"). The scrub still
+     owns the whole transition; these clamps only assert the end states, which scroll
+     position already decided. */
+  if (exitST){
+    if (exitST.progress >= .995) data.exit = 1;
+    else if (exitST.progress <= .005) data.exit = 0;
+  }
   /* rise and exit fold into the single vertical offset the scene actually uses */
   const yOff = data.y - 1.5 * ((1 - data.rise) + data.exit);
   const vis0 = data.opacity * (1 - data.exit);
@@ -1564,11 +1573,12 @@ ScrollTrigger.addEventListener('refresh', () => {
 /* the exit: the finale row sinks through the floor as the brewer arrives — every can
    leaves the theatre together, reflections meeting them at the floor line. Scrubbed,
    so scrolling back up raises them right back out. */
-gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%', scrub:.7,
+const exitTL = gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%', scrub:.7,
   onEnter(){ tintScene = false; }, onLeaveBack(){ tintScene = true; }}})
   .fromTo(data, {exit:0}, {exit:1, ease:'none'}, 0)   /* explicit from: a scrub must
       never be allowed to capture an implicit start value */
   .to(data.bg, {r:.030, g:.022, b:.014, ease:'none'}, 0);
+const exitST = exitTL.scrollTrigger;
 
 /* the banner drifts as it passes; the drawing needs nothing else */
 gsap.fromTo('#profil .banner img', {xPercent:0}, {xPercent:-13, ease:'none',
