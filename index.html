@@ -1139,6 +1139,29 @@ glow.rotation.x = -Math.PI/2; glow.position.y = GROUND_Y + .002; glow.renderOrde
    ciao's `decay: .1`, which is almost no falloff, so front, under and rear filled the
    body evenly from three directions. Physically-correct decay 2 (intensities rescaled
    by distance squared) plus a dominant key restores the dark limb. */
+/* ---------- the horizon ----------
+   Their own hero already stands the cans IN the drawn desert: the engraving runs along
+   the foot of the page and the cans sit in it. Here that drawing becomes a real object
+   in the scene, so the cans stand in the landscape in three dimensions instead of being
+   pasted over a strip. Additive against a near-black room means only the gold linework
+   registers and there is no rectangle edge to hide. */
+const horizonTex = loader.load('img/teikning.jpg');
+horizonTex.colorSpace = THREE.SRGBColorSpace;
+const horizon = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
+  new THREE.MeshBasicMaterial({map:horizonTex, transparent:true, opacity:.42,
+    blending:THREE.AdditiveBlending, depthWrite:false}));
+horizon.renderOrder = -1;
+scene.add(horizon);
+const HZ_Z = -4.2, HZ_RATIO = 594/1920;
+function sizeHorizon(){
+  const dist = camera.position.z - HZ_Z;
+  const h = 2 * Math.tan(camera.fov * Math.PI/360) * dist;
+  const pw = Math.max(h * camera.aspect * 1.6, 7);   /* wider than frame so it can drift */
+  horizon.scale.set(pw, pw * HZ_RATIO, 1);
+  horizon.position.set(0, GROUND_Y + pw * HZ_RATIO * .10, HZ_Z);
+}
+sizeHorizon();
+
 const key = new THREE.SpotLight(0xffffff, 150, 9, Math.PI/4, .85, 2);
 key.position.set(-1.6, 2.7, 2.2); key.target.position.set(0, 0, 0);
 key.castShadow = true;
@@ -1348,6 +1371,12 @@ gsap.ticker.add(() => {
       canBoxes.push({i, left:_a.x, right:_b.x, top, bottom:_b.y, vis});
     }
   });
+  /* the horizon travels with the journey, a fraction of the carousel's own motion, so
+     the land reads as far away rather than glued to the cans */
+  horizon.position.x = -data.focus * .085 - ptr.cx * .05;
+  horizon.position.y = GROUND_Y + horizon.scale.y * .10 + yOff * .35;
+  horizon.material.opacity = .42 * vis0;
+  horizon.visible = vis0 > .01;
   ground.position.y = gy;
   mirrorClip.constant = gy;
   glow.position.set(data.x, gy + .002, 0);
@@ -1371,6 +1400,7 @@ addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
   composer.setSize(innerWidth, innerHeight);
   bloom.setSize(innerWidth*.5, innerHeight*.5);
+  sizeHorizon();
 });
 
 /* ---------- entrance ----------
