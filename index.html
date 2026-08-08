@@ -1241,9 +1241,15 @@ zenith.position.set(.3, 4, .6); scene.add(zenith, zenith.target);
 /* Post: a half-res UnrealBloom at threshold 1 so ONLY the true HDR highlights bloom.
    ciao runs 0.1/0.1/1 through an EffectComposer; without it, high-range speculars
    clip flat instead of blooming the way a camera's does. */
+/* MSAA HAS TO LIVE ON THIS TARGET. `antialias:true` on the renderer only applies to the
+   default framebuffer, and everything here is drawn into the composer's target instead,
+   so with samples:0 every silhouette was hard-aliased and crawled while the cans moved.
+   WebGL2 resolves multisampling in hardware, which is far cheaper than any post-process
+   AA pass. Phones get 2 samples; anything without WebGL2 falls back to 0 gracefully. */
+const MSAA = renderer.capabilities.isWebGL2 ? (innerWidth < 768 ? 2 : 4) : 0;
 const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(
   innerWidth * renderer.getPixelRatio(), innerHeight * renderer.getPixelRatio(),
-  {type: THREE.HalfFloatType, samples: 0}));
+  {type: THREE.HalfFloatType, samples: MSAA}));
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(innerWidth*.5, innerHeight*.5), .06, .25, 1.05);
