@@ -49,16 +49,16 @@
 <link href="https://api.fontshare.com/v2/css?f[]=khand@600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --myrkur:#070708;          /* page ground, the reference's black made ours */
-  --lakk:#F5F4F1;            /* can lacquer, now the ink color of type */
-  --al:#8E9096;
+  --myrkur:#0C0906;          /* page ground, the reference's black made ours */
+  --lakk:#F3EADB;            /* can lacquer, now the ink color of type */
+  --al:#9C9084;
   --gull:#CD8F2B;
   --ink:#C13F4A;             /* live flavor ink, JS-driven */
   --disp:'Khand',sans-serif; --body:'Satoshi',sans-serif;
   --ease:cubic-bezier(.16,1,.3,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scrollbar-width:thin;scrollbar-color:#333 #0a0a0b}
+html{scrollbar-width:thin;scrollbar-color:#3A3128 #0A0805}
 body{background:var(--myrkur);color:var(--lakk);font:400 17px/1.6 var(--body);overflow-x:clip}
 h1,h2,h3{font-family:var(--disp);font-weight:600;letter-spacing:.01em;line-height:1.08;text-transform:uppercase}
 a{color:inherit}
@@ -70,18 +70,18 @@ button{font:inherit;cursor:pointer}
 #gate{position:fixed;inset:0;z-index:90;background:var(--myrkur);display:grid;place-items:center;text-align:center;padding:24px}
 #gate .crest{display:grid;justify-items:center}
 #gate .crest img{height:clamp(120px,20vh,180px);width:auto}
-#gate p{margin:18px 0 30px;color:#9a9890;max-width:36ch}
+#gate p{margin:18px 0 30px;color:#A79A88;max-width:36ch}
 #gate .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 #gate button{border:1px solid var(--lakk);background:var(--lakk);color:var(--myrkur);
   border-radius:999px;padding:14px 30px;font-weight:700;transition:transform .16s var(--ease)}
 #gate button.no{background:transparent;color:var(--lakk)}
 #gate button:active{transform:scale(.97)}
 #gate.hide{display:none}
-#gate .under{margin-top:26px;font-size:13px;color:#5c5a55}
+#gate .under{margin-top:26px;font-size:13px;color:#6E6355}
 
 /* ---------- nav ---------- */
 .navscrim{position:fixed;inset:0 0 auto;height:140px;z-index:30;pointer-events:none;
-  background:linear-gradient(180deg,rgba(7,7,8,.72),rgba(7,7,8,0))}
+  background:linear-gradient(180deg,rgba(12,9,6,.72),rgba(12,9,6,0))}
 nav{position:fixed;inset:18px 0 auto;z-index:40;display:flex;justify-content:space-between;align-items:center;
   padding:0 clamp(20px,4vw,56px)}
 nav .mark{display:block}
@@ -90,7 +90,7 @@ nav .mark:hover img{opacity:.85}
 nav .links{display:flex;gap:26px;font-size:14px;font-weight:500;align-items:center}
 nav .links a{text-decoration:none;opacity:.7;transition:opacity .2s}
 nav .links a:hover,nav .links a:focus-visible{opacity:1}
-nav .links a.cta{border:1px solid rgba(245,244,241,.4);border-radius:999px;padding:9px 18px;opacity:1}
+nav .links a.cta{border:1px solid rgba(243,234,219,.4);border-radius:999px;padding:9px 18px;opacity:1}
 nav .links a.cta:hover{border-color:var(--gull);color:var(--gull)}
 @media(max-width:760px){nav .links a:not(.cta){display:none}}
 
@@ -126,16 +126,16 @@ section{position:relative;z-index:10}
 #gamme .bp .row{display:flex;align-items:baseline;gap:16px;margin-top:10px;flex-wrap:wrap}
 #gamme .bp .abv{font-family:var(--disp);font-weight:700;font-size:clamp(1.1rem,2vw,1.5rem);
   color:var(--ink);letter-spacing:.02em}
-#gamme .bp p{color:#b5b3ac;max-width:46ch;font-size:clamp(.95rem,1.3vw,1.05rem)}
+#gamme .bp p{color:#C4B8A6;max-width:46ch;font-size:clamp(.95rem,1.3vw,1.05rem)}
 #gamme .side{display:grid;justify-items:end;gap:14px}
-#gamme .count{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.12em;color:#5c5a55;
+#gamme .count{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.12em;color:#6E6355;
   font-variant-numeric:tabular-nums}
 #gamme .count b{color:var(--lakk)}
 #gamme .rail{display:grid;gap:7px}
-#gamme .rail i{display:block;width:2px;height:16px;background:rgba(245,244,241,.18);
+#gamme .rail i{display:block;width:2px;height:16px;background:rgba(243,234,219,.18);
   transition:background .35s var(--ease),height .35s var(--ease)}
 #gamme .rail i.on{background:var(--ink);height:24px}
-#gamme .hint{font-size:12.5px;letter-spacing:.16em;color:#5c5a55;font-weight:600;
+#gamme .hint{font-size:12.5px;letter-spacing:.16em;color:#6E6355;font-weight:600;
   writing-mode:vertical-rl;text-transform:uppercase}
 @media(max-width:760px){#gamme .strip{grid-template-columns:1fr}#gamme .side{justify-items:start}
   #gamme .rail{grid-auto-flow:column}#gamme .rail i{width:16px;height:2px}
@@ -144,13 +144,13 @@ section{position:relative;z-index:10}
 /* ---------- imagery: their real photography, clip-revealed ---------- */
 .imgw{position:relative;overflow:clip;border-radius:16px}
 .imgw img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:center}
-figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
+figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 
 /* ---------- profile: the label's world ---------- */
 #profil{min-height:110vh;display:grid;align-items:center}
 #profil .copy{max-width:520px}
 #profil h2{font-size:clamp(2.4rem,5.6vw,4.4rem)}
-#profil p{margin-top:18px;color:#b5b3ac;max-width:46ch}
+#profil p{margin-top:18px;color:#C4B8A6;max-width:46ch}
 
 /* ---------- benefit chapters ---------- */
 .kafli{min-height:130vh;display:grid;align-items:center}
@@ -160,24 +160,24 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
 .kafli h2{font-size:clamp(2.6rem,7vw,5.6rem);color:var(--lakk)}
 .kafli .abv{color:var(--ink);transition:color .4s linear}
 .kafli .abv{font-family:var(--disp);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;margin-top:6px}
-.kafli p{margin-top:14px;color:#b5b3ac;max-width:38ch;display:inline-block}
+.kafli p{margin-top:14px;color:#C4B8A6;max-width:38ch;display:inline-block}
 
 /* ---------- argument: the brewer ---------- */
 #rok{min-height:100vh;display:grid;align-items:center;text-align:center}
 #rok .lede{font-family:var(--disp);font-weight:600;text-transform:uppercase;
   font-size:clamp(1.9rem,4.6vw,3.8rem);line-height:1.14;max-width:26ch;margin:0 auto}
 #rok .lede em{font-style:normal;color:var(--gull)}
-#rok .sub{margin-top:24px;color:#9a9890;max-width:52ch;margin-inline:auto}
+#rok .sub{margin-top:24px;color:#A79A88;max-width:52ch;margin-inline:auto}
 
 /* ---------- brewery: the photographic second act ---------- */
 #hus{padding:0 0 14vh}
 #hus .full{position:relative;height:100vh;display:grid;align-items:end}
 #hus .full .imgw{position:absolute;inset:0;border-radius:0}
 #hus .full .imgw::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(7,7,8,.6),rgba(7,7,8,.1) 42%,rgba(7,7,8,.82))}
+  background:linear-gradient(180deg,rgba(12,9,6,.6),rgba(12,9,6,.1) 42%,rgba(12,9,6,.82))}
 #hus .ftext{position:relative;padding-bottom:9vh;width:100%}
 #hus .ftext h2{font-size:clamp(2.6rem,7vw,5.6rem)}
-#hus .ftext p{margin-top:12px;color:#cfcdc6;max-width:46ch}
+#hus .ftext p{margin-top:12px;color:#DCD1BF;max-width:46ch}
 #hus .duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,44px);margin-top:12vh}
 #hus .duo .imgw{aspect-ratio:3/4}
 #hus .duo figure.off{margin-top:11vh}
@@ -188,11 +188,11 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
    elastic entrance, hover lifts one and pushes the rest aside. */
 #arstid{padding:15vh 0;overflow:clip}
 #arstid h2{font-size:clamp(2.2rem,5vw,4rem);max-width:14ch}
-.lead{margin-top:16px;color:#b5b3ac;max-width:52ch}
+.lead{margin-top:16px;color:#C4B8A6;max-width:52ch}
 #arstid .fan{position:relative;height:clamp(360px,52vh,500px);margin-top:34px;
   display:flex;justify-content:center;align-items:center}
 #arstid .fcard{position:absolute;width:clamp(190px,17.5vw,250px);
-  background:#131316;border:1px solid rgba(245,244,241,.1);border-radius:18px;
+  background:#171209;border:1px solid rgba(243,234,219,.1);border-radius:18px;
   padding:24px 16px 18px;text-align:center;will-change:transform;
   box-shadow:0 24px 60px rgba(0,0,0,.55);transform-origin:50% 100%}
 #arstid .fcard img{height:clamp(170px,24vh,230px);object-fit:contain;margin:0 auto 16px;pointer-events:none}
@@ -205,16 +205,16 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
 }
 
 /* ---------- water ---------- */
-#vatn{padding:14vh 0;background:#0b1013}
+#vatn{padding:14vh 0;background:#100E09}
 #vatn .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center}
 #vatn h2{font-size:clamp(2.2rem,5vw,4rem);max-width:13ch}
-#vatn p{margin-top:18px;color:#b5b3ac;max-width:46ch}
+#vatn p{margin-top:18px;color:#C4B8A6;max-width:46ch}
 #vatn ul{list-style:none;margin-top:28px;display:grid;gap:0}
-#vatn li{padding:16px 0;border-top:1px solid rgba(245,244,241,.12);display:grid;gap:4px}
+#vatn li{padding:16px 0;border-top:1px solid rgba(243,234,219,.12);display:grid;gap:4px}
 #vatn li b{font-family:var(--disp);font-weight:600;font-size:1.3rem;letter-spacing:.02em;text-transform:uppercase}
-#vatn li span{color:#9a9890;font-size:15px}
-#vatn .note{font-size:15px;color:#9a9890}
-#vatn .imgw{aspect-ratio:3/2;background:#0d1417}
+#vatn li span{color:#A79A88;font-size:15px}
+#vatn .note{font-size:15px;color:#A79A88}
+#vatn .imgw{aspect-ratio:3/2;background:#141007}
 @media(max-width:860px){#vatn .split{grid-template-columns:1fr}}
 
 /* ---------- function hall ---------- */
@@ -222,31 +222,55 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
 #salur h2{font-size:clamp(2.2rem,5.4vw,4.2rem);max-width:14ch}
 #salur .split{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,72px);margin-top:52px}
 #salur ul{list-style:none;display:grid}
-#salur li{padding:16px 0;border-bottom:1px solid rgba(245,244,241,.12);display:flex;
+#salur li{padding:16px 0;border-bottom:1px solid rgba(243,234,219,.12);display:flex;
   justify-content:space-between;gap:20px}
-#salur li span:last-child{color:#9a9890;text-align:right;white-space:nowrap}
+#salur li span:last-child{color:#A79A88;text-align:right;white-space:nowrap}
 #salur .price{font-family:var(--disp);font-size:clamp(2.4rem,5vw,3.8rem);font-weight:600;line-height:1}
-#salur .price small{font-size:.34em;font-weight:500;color:#9a9890;letter-spacing:.06em}
+#salur .price small{font-size:.34em;font-weight:500;color:#A79A88;letter-spacing:.06em}
 #salur .book{margin-top:26px;display:inline-block;background:var(--lakk);color:var(--myrkur);
   text-decoration:none;border-radius:999px;padding:15px 30px;font-weight:700;transition:transform .16s var(--ease)}
 #salur .book:active{transform:scale(.97)}
-#salur .note{margin-top:18px;font-size:14px;color:#9a9890;max-width:44ch;line-height:1.65}
+#salur .note{margin-top:18px;font-size:14px;color:#A79A88;max-width:44ch;line-height:1.65}
 @media(max-width:860px){#salur .split{grid-template-columns:1fr}#salur li span:last-child{white-space:normal}}
+
+/* ---------- news: an index, not cards ----------
+   Rows of date + headline; the pointer carries a preview of whatever it is over.
+   Nothing else on the page behaves like this, and it stays a plain readable list
+   without the pointer (touch, keyboard, reduced motion). */
+#frettir{padding:15vh 0;position:relative}
+#frettir h2{font-size:clamp(2rem,4.6vw,3.4rem)}
+#frettir .feed{margin-top:44px;border-top:1px solid rgba(243,234,219,.12)}
+#frettir a.item{display:grid;grid-template-columns:auto 1fr auto;gap:clamp(16px,3vw,44px);
+  align-items:baseline;padding:26px 4px;border-bottom:1px solid rgba(243,234,219,.12);
+  text-decoration:none;color:inherit;transition:color .3s var(--ease),padding-left .4s var(--ease)}
+#frettir a.item:hover,#frettir a.item:focus-visible{color:var(--gull);padding-left:18px}
+#frettir .when{font-size:13px;color:#7C7060;font-variant-numeric:tabular-nums;white-space:nowrap}
+#frettir .what{font-family:var(--disp);font-weight:600;text-transform:uppercase;
+  letter-spacing:.02em;font-size:clamp(1.25rem,2.6vw,2rem);line-height:1.05}
+#frettir .go{font-size:13px;color:#7C7060;white-space:nowrap}
+#frettir a.item:hover .go,#frettir a.item:focus-visible .go{color:var(--gull)}
+#frettir .peek{position:fixed;top:0;left:0;width:210px;height:250px;pointer-events:none;
+  z-index:20;opacity:0;border-radius:14px;overflow:hidden;background:#171209;
+  border:1px solid rgba(243,234,219,.12);will-change:transform,opacity}
+#frettir .peek img{width:100%;height:100%;object-fit:contain;padding:10px}
+@media(hover:none),(prefers-reduced-motion:reduce){#frettir .peek{display:none}}
+@media(max-width:640px){#frettir a.item{grid-template-columns:1fr;gap:6px}
+  #frettir .go{display:none}}
 
 /* ---------- contact ---------- */
 #samband{padding:14vh 0 4vh}
 #samband h2{font-size:clamp(2rem,4.6vw,3.4rem)}
 #samband .people{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   gap:10px;margin-top:44px}
-#samband .card{background:#111114;border:1px solid rgba(245,244,241,.08);border-radius:14px;
+#samband .card{background:#151009;border:1px solid rgba(243,234,219,.08);border-radius:14px;
   padding:26px 24px;display:grid;gap:6px;align-content:start}
 #samband .who{font-family:var(--disp);font-weight:600;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em}
 #samband .role{color:var(--gull);font-size:14px;font-weight:600;margin-bottom:8px}
-#samband a{color:#cfcdc6;text-decoration:none;font-size:15px;width:max-content}
+#samband a{color:#DCD1BF;text-decoration:none;font-size:15px;width:max-content}
 #samband a:hover,#samband a:focus-visible{color:var(--lakk);text-decoration:underline}
 
 /* ---------- full range ---------- */
-#urval{padding:16vh 0;background:#0d0d0f}
+#urval{padding:16vh 0;background:#120E09}
 #urval h2{font-size:clamp(2.2rem,5vw,4rem);max-width:16ch}
 /* ---------- the re-inking desert ----------
    The illustration is used as a luminance MASK, not as a picture: the gold linework
@@ -265,16 +289,16 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
   filter:brightness(1.55) saturate(1.12);
   background:linear-gradient(90deg,#C13F4A,#19ABC7,#4B8139,#D7A91A,#BAAA85,#6189A7,
     #CA9124,#8E9096,#C13F4A,#19ABC7,#4B8139,#D7A91A,#BAAA85,#6189A7,#CA9124,#8E9096)}
-#profil .eydi figcaption{margin-top:20px;font-size:14px;color:#6d6b66}
+#profil .eydi figcaption{margin-top:20px;font-size:14px;color:#7C7060}
 /* no mask support: fall back to the illustration as shipped */
 @supports not ((mask-mode:luminance) or (-webkit-mask-mode:luminance)){
   #profil .eydiw{background:url(img/teikning.jpg) center/cover}
   #profil .eydiw .band{display:none}
 }
 #urval .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:52px}
-#urval .cell{background:#131316;border:1px solid rgba(245,244,241,.06);border-radius:12px;
+#urval .cell{background:#171209;border:1px solid rgba(243,234,219,.06);border-radius:12px;
   padding:22px 12px 16px;text-align:center;transition:transform .35s var(--ease),border-color .35s}
-#urval .cell:hover{transform:translateY(-6px);border-color:rgba(245,244,241,.22)}
+#urval .cell:hover{transform:translateY(-6px);border-color:rgba(243,234,219,.22)}
 #urval .cell img{height:185px;object-fit:contain;margin:0 auto 14px}
 #urval .cell .n{font-weight:700;font-size:15px}
 #urval .cell .a{font-size:13px;color:var(--al);margin-top:2px}
@@ -288,44 +312,44 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
 #merki .canhold canvas{width:100%;height:100%}
 #merki form{display:grid;gap:14px}
 #merki label{font-weight:700;font-size:14px}
-#merki input{border:1px solid rgba(245,244,241,.22);background:#111114;border-radius:12px;
+#merki input{border:1px solid rgba(243,234,219,.22);background:#151009;border-radius:12px;
   padding:16px 18px;font:500 17px var(--body);color:var(--lakk);width:100%}
-#merki input::placeholder{color:#6d6b66}
+#merki input::placeholder{color:#7C7060}
 #merki input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-#merki .hint{font-size:14px;color:#9a9890;max-width:44ch}
+#merki .hint{font-size:14px;color:#A79A88;max-width:44ch}
 #merki .mail{margin-top:10px;display:inline-block;width:max-content;background:var(--lakk);color:var(--myrkur);
   text-decoration:none;border-radius:999px;padding:15px 28px;font-weight:700;transition:transform .16s var(--ease)}
 #merki .mail:active{transform:scale(.97)}
 @media(max-width:860px){#merki .play{grid-template-columns:1fr}#merki .canhold{order:-1;height:52vh}}
 
 /* ---------- tour ---------- */
-#tur{padding:16vh 0;background:#0d0d0f}
+#tur{padding:16vh 0;background:#120E09}
 #tur h2{font-size:clamp(2.4rem,6vw,4.6rem);max-width:16ch}
 #tur .split{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,5vw,80px);margin-top:56px}
 #tur .brew .imgw{aspect-ratio:3/2;margin-bottom:30px}
 #tur ul{list-style:none;display:grid}
-#tur li{padding:18px 0;border-bottom:1px solid rgba(245,244,241,.12);display:flex;justify-content:space-between;gap:20px}
-#tur li span:last-child{color:#9a9890;text-align:right}
+#tur li{padding:18px 0;border-bottom:1px solid rgba(243,234,219,.12);display:flex;justify-content:space-between;gap:20px}
+#tur li span:last-child{color:#A79A88;text-align:right}
 #tur .price{font-family:var(--disp);font-size:clamp(2.8rem,6vw,4.6rem);font-weight:600;line-height:1}
-#tur .price small{font-size:.35em;font-weight:500;color:#9a9890;letter-spacing:.06em}
+#tur .price small{font-size:.35em;font-weight:500;color:#A79A88;letter-spacing:.06em}
 #tur .book{margin-top:30px;display:inline-block;background:var(--gull);color:var(--myrkur);text-decoration:none;
   border-radius:999px;padding:16px 32px;font-weight:700;transition:transform .16s var(--ease)}
 #tur .book:active{transform:scale(.97)}
-#tur .note{margin-top:14px;font-size:14px;color:#9a9890}
+#tur .note{margin-top:14px;font-size:14px;color:#A79A88}
 @media(max-width:860px){#tur .split{grid-template-columns:1fr}}
 
 /* ---------- footer ---------- */
-footer{padding:96px 0 40px;background:#0a0a0c;border-top:1px solid rgba(245,244,241,.07);font-size:14px}
+footer{padding:96px 0 40px;background:#0A0805;border-top:1px solid rgba(243,234,219,.07);font-size:14px}
 footer .ftop{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:clamp(32px,6vw,110px);align-items:start}
 footer .fbrand img{height:110px;width:auto}
-footer .fbrand p{margin-top:20px;color:#9a9890;max-width:34ch;line-height:1.7}
+footer .fbrand p{margin-top:20px;color:#A79A88;max-width:34ch;line-height:1.7}
 footer .fcols{display:grid;grid-template-columns:repeat(3,auto);gap:clamp(28px,4.5vw,84px)}
 footer .fcols h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;letter-spacing:.08em;
   color:var(--gull);margin-bottom:14px}
-footer .fcols a{display:block;color:#cfcdc6;text-decoration:none;padding:5px 0;width:max-content}
+footer .fcols a{display:block;color:#DCD1BF;text-decoration:none;padding:5px 0;width:max-content}
 footer .fcols a:hover,footer .fcols a:focus-visible{color:var(--lakk);text-decoration:underline}
-footer .fline{height:1px;background:rgba(245,244,241,.09);margin:56px 0 26px}
-footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#6d6b66;font-size:13px}
+footer .fline{height:1px;background:rgba(243,234,219,.09);margin:56px 0 26px}
+footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#7C7060;font-size:13px}
 @media(max-width:860px){footer .ftop{grid-template-columns:1fr}footer .fcols{grid-template-columns:1fr 1fr}}
 
 .rv{opacity:0;transform:translateY(26px)}
@@ -387,6 +411,7 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
     <a href="#hus">Brugghúsið</a>
     <a href="#merki">Sérmerking</a>
     <a href="#salur">Veislusalur</a>
+    <a href="#frettir">Fréttir</a>
     <a class="cta" href="#tur">Bóka heimsókn</a>
   </div>
 </nav>
@@ -461,6 +486,15 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
   <div class="wrapc">
     <p class="lede">Bruggmeistari með meistaragráðu frá Heriot-Watt. Valgeir bruggaði fyrstu lögun Ölvisholts 2007 og stýrir henni aftur í dag.</p>
     <p class="sub rv">Á milli lá leiðin um Borg Brugghús, Ölgerðina og RVK Bruggfélag. Bjórana okkar færðu á betri börum landsins og í Vínbúðinni. Innnes sér um sölu og dreifingu á íslenskum markaði.</p>
+  </div>
+</section>
+
+<!-- news: their own fréttir, as a hover-reveal index -->
+<section id="frettir">
+  <div class="wrapc">
+    <h2>Fréttir</h2>
+    <div class="feed" id="feed"></div>
+    <div class="peek" id="peek" aria-hidden="true"><img alt=""></div>
   </div>
 </section>
 
@@ -607,6 +641,7 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
           <a href="#tur">Bruggstofan</a>
           <a href="#salur">Veislusalur</a>
           <a href="mailto:salur@olvisholt.is">Bóka</a>
+          <a href="#frettir">Fréttir</a>
         </div>
         <div>
           <h3>Samband</h3>
@@ -670,6 +705,18 @@ const SEASON = [
 ];
 const ALL = [...BEERS, ...SEASON];
 
+/* their real fréttir, titles/dates/links taken from olvisholt.is/feed (2026-08-08) */
+const NEWS = [
+  {t:'Sumarbjórinn Birta',    d:'17. apríl 2025',     u:'https://olvisholt.is/sumarbjorinn-birta/',      img:'cans/olvisholt_birta_33cl.png'},
+  {t:'Kolsýrt vatn',          d:'18. febrúar 2025',   u:'https://olvisholt.is/kolsyrt-vatn/',            img:'img/soda.png'},
+  {t:'Pretzie Októberfest',   d:'6. september 2024',  u:'https://olvisholt.is/pretzie-oktoberfest-bjor/',img:'cans/Pretzie.png'},
+  {t:'Páskabjór',             d:'23. febrúar 2024',   u:'https://olvisholt.is/paskabjor/',               img:'cans/olvisholt_paskabjor_33cl.png'},
+  {t:'Jólabjór 2024',         d:'1. nóvember 2023',   u:'https://olvisholt.is/jolabjor-2024/',           img:'cans/olvisholt_jola_klassik_33cl-2025.png'},
+  {t:'Ný staðsetning',        d:'12. október 2023',   u:'https://olvisholt.is/new-location/',            img:'img/brugg-4330.jpg'},
+  {t:'Jólabjór',              d:'10. október 2023',   u:'https://olvisholt.is/christmas-beer/',          img:'cans/olvisholt_jola_lite_33cl-2025.png'},
+  {t:'Endurmörkun',           d:'10. október 2023',   u:'https://olvisholt.is/rebrand/',                 img:'img/teikning.jpg'},
+];
+
 /* no WebGL (old device, exhausted contexts, headless bot) must never mean a broken
    page: those visitors get the same fully readable static path as reduced-motion */
 const hasGL = (() => { try { const c = document.createElement('canvas');
@@ -696,6 +743,30 @@ document.getElementById('gno').onclick = () => {
 const cell = b => `<div class="cell"><img loading="lazy" src="cans/${b.slug}.png"
    alt="${b.name} 33cl dós"><div class="n">${b.name}</div><div class="a">${b.abv}</div></div>`;
 document.getElementById('ugrid').innerHTML = ALL.map(cell).join('');
+
+/* news index + pointer preview (built outside the 3D branch so it works everywhere) */
+document.getElementById('feed').innerHTML = NEWS.map(n =>
+  `<a class="item" href="${n.u}" rel="noopener" data-img="${n.img}">
+     <span class="when">${n.d}</span><span class="what">${n.t}</span><span class="go">Lesa á olvisholt.is</span>
+   </a>`).join('');
+{
+  const peek = document.getElementById('peek'), pimg = peek.querySelector('img');
+  let px = 0, py = 0, cx = 0, cy = 0, on = false, raf = 0;
+  const loop = () => {
+    cx += (px - cx) * .16; cy += (py - cy) * .16;
+    peek.style.transform = `translate3d(${cx}px,${cy}px,0)`;
+    raf = on || Math.abs(px - cx) > .5 ? requestAnimationFrame(loop) : 0;
+  };
+  document.querySelectorAll('#frettir a.item').forEach(a => {
+    a.addEventListener('pointerenter', e => {
+      if (e.pointerType !== 'mouse') return;
+      pimg.src = a.dataset.img; on = true; peek.style.opacity = '1';
+      if (!raf) { cx = e.clientX + 24; cy = e.clientY - 125; raf = requestAnimationFrame(loop); }
+    });
+    a.addEventListener('pointermove', e => { px = e.clientX + 24; py = e.clientY - 125; });
+    a.addEventListener('pointerleave', () => { on = false; peek.style.opacity = '0'; });
+  });
+}
 document.getElementById('sfan').innerHTML = SEASON.map(b =>
   `<div class="fcard"><img loading="lazy" src="cans/${b.slug}.png" alt="${b.name} 33cl dós">
    <div class="n">${b.name}</div><div class="a">${b.abv}</div></div>`).join('');
@@ -717,7 +788,7 @@ gsap.ticker.lagSmoothing(0);
 const data = {
   focus:0, focusTarget:0, spread:1,       // carousel state
   x:0, y:0, scale:1, opacity:0,
-  bg:new THREE.Color('#070708'),
+  bg:new THREE.Color('#0C0906'),
 };
 const SPACING = .92;
 
@@ -1021,7 +1092,7 @@ srList.innerHTML = '<h2>Bjórarnir</h2><ul>' + BEERS.map(b =>
 document.getElementById('gamme').appendChild(srList);
 
 const INK_A = new THREE.Color(), INK_B = new THREE.Color(), INK = new THREE.Color();
-const WHITE = new THREE.Color('#ffffff'), BLACK = new THREE.Color('#070708');
+const WHITE = new THREE.Color('#ffffff'), BLACK = new THREE.Color('#0C0906');
 let lastIdx = -1;
 function applyFlavorDOM(){
   const f = Math.max(0, Math.min(BEERS.length - 1, data.focus));
@@ -1063,10 +1134,10 @@ let tintScene = true;
    exactly where every can is, so the occlusion is projected instead. Free, exact,
    and it can use each can's own ink rather than the focused one. */
 const wmLetters = [...document.querySelectorAll('#gamme h1 i')];
-const LACQUER = new THREE.Color('#F5F4F1');
+const LACQUER = new THREE.Color('#F3EADB');
 const INKS_DARK = BEERS.map(b => new THREE.Color(b.ink).multiplyScalar(.55));
-const wmCur = wmLetters.map(() => new THREE.Color('#F5F4F1'));
-const wmTgt = wmLetters.map(() => new THREE.Color('#F5F4F1'));
+const wmCur = wmLetters.map(() => new THREE.Color('#F3EADB'));
+const wmTgt = wmLetters.map(() => new THREE.Color('#F3EADB'));
 const canBoxes = [];
 const PRJ = new THREE.Vector3();
 const CAN_R = .33, CAN_TOP = 1.15;
@@ -1275,7 +1346,7 @@ gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%',
   onEnter(){ tintScene = false; }, onLeaveBack(){ tintScene = true; }}})
   .to(data, {y:-1.5, ease:'power1.in'}, 0)
   .to(data, {opacity:0, ease:'none'}, .45)
-  .to(data.bg, {r:.027, g:.027, b:.031, ease:'none'}, 0);
+  .to(data.bg, {r:.030, g:.022, b:.014, ease:'none'}, 0);
 
 /* the desert scrubs through all eight inks across its own scroll span */
 gsap.fromTo('#profil .eydiw .band', {xPercent:0}, {xPercent:-50, ease:'none',
