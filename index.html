@@ -1414,15 +1414,18 @@ gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%',
 {
   const track = document.getElementById('ltrack');
   const CAN = 'cans/olvisholt_vaegur.png';            /* silhouette only, via alpha */
-  const SLOTS = [                                        /* x%, y%, height% of track */
-    {x:8,  y:26, h:46}, {x:16, y:40, h:38}, {x:28, y:20, h:52}, {x:39, y:44, h:34},
-    {x:51, y:26, h:46}, {x:63, y:42, h:36}, {x:75, y:22, h:50}, {x:88, y:40, h:38},
+  /* every can the same size; only the vertical position varies, so the row reads as
+     one product family standing in the land rather than a perspective jumble */
+  const PORT_H = 44;                                     /* % of track height */
+  const SLOTS = [                        /* x%, y% of track; x is evenly spaced */
+    {x:12,   y:24}, {x:22.5, y:33}, {x:33,   y:21}, {x:43.5, y:32},
+    {x:54,   y:24}, {x:64.5, y:33}, {x:75,   y:22}, {x:85.5, y:31},
   ];
   const inks = BEERS.map((b, i) => {
     const s = SLOTS[i];
     const slot = document.createElement('div');
     slot.className = 'slot';
-    slot.style.cssText = `left:${s.x}%;top:${s.y}%;height:${s.h}%;aspect-ratio:601/751`;
+    slot.style.cssText = `left:${s.x}%;top:${s.y}%;height:${PORT_H}%;aspect-ratio:601/751`;
     const port = document.createElement('div');
     port.className = 'port';
     port.style.webkitMaskImage = port.style.maskImage = `url(${CAN})`;
@@ -1453,7 +1456,7 @@ gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%',
   document.fonts.ready.then(alignPorts);
 
   /* the slow pan: the whole land drifts while the section is on screen */
-  gsap.fromTo(track, {xPercent:0}, {xPercent:-24, ease:'none',
+  gsap.fromTo(track, {xPercent:0}, {xPercent:-16, ease:'none',
     scrollTrigger:{trigger:'#profil .eydi', start:'top bottom', end:'bottom top',
       scrub:1.1}});   /* no realign on scroll: slot and track move together, so the
                           mask offset between them is invariant */
