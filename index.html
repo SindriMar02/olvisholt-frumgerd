@@ -283,39 +283,16 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 /* ---------- full range ---------- */
 #urval{padding:16vh 0;background:#120E09}
 #urval h2{font-size:clamp(2.2rem,5vw,4rem);max-width:16ch}
-/* ---------- one land, eight windows ----------
-   The panorama is drawn once in the brand gold. Punched through it are can-shaped
-   ports, each showing the SAME continuous drawing but in one beer's ink, aligned so
-   the linework runs straight through the window. The can silhouette comes from their
-   own can PNG used as an alpha mask; the drawing comes from a luminance mask; the two
-   are intersected, so a port is exactly "this beer's ink, only where the drawing is,
-   only inside a can". The whole track pans slowly with scroll. */
+/* ---------- the banner, plain and full width ----------
+   Their commissioned drawing carries itself: full bleed, faded into the room at its
+   top and bottom edges, drifting slightly as it passes. The story sits under it. */
 #profil .eydi{margin-top:clamp(48px,9vh,110px)}
-#profil .land{position:relative;overflow:hidden;height:clamp(300px,46vh,470px);
-  background:#0C0906}
-#profil .track{position:absolute;inset:0;width:132%;will-change:transform}
-#profil .draw,#profil .port,#profil .ink{position:absolute;
-  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
-/* the land itself: gold, revealed only where the engraving is */
-#profil .draw{inset:0;background:linear-gradient(180deg,#D89A35,#A96F1D 62%,#7E5213);
-  -webkit-mask-image:url(img/teikning.jpg); mask-image:url(img/teikning.jpg);
-  -webkit-mask-size:100% 100%; mask-size:100% 100%;
-  -webkit-mask-mode:luminance; mask-mode:luminance;
-  filter:brightness(1.2)}
-/* a slot holds an unmasked label; only the port inside it is can-shaped, because a
-   CSS mask clips an element's DESCENDANTS too and ate the labels */
-#profil .slot{position:absolute}
-#profil .port{inset:0;background:#0C0906;
-  -webkit-mask-size:100% 100%; mask-size:100% 100%;
-  -webkit-mask-mode:alpha; mask-mode:alpha}
-#profil .ink{inset:0;-webkit-mask-mode:luminance; mask-mode:luminance;
-  filter:brightness(1.6) saturate(1.1)}
-#profil .tag{position:absolute;left:50%;top:100%;transform:translateX(-50%);
-  margin-top:10px;white-space:nowrap;font:600 12px/1 var(--body);letter-spacing:.14em;
-  text-transform:uppercase;color:#8A7C6A}
-#profil .eydi figcaption{margin-top:26px;font-size:14px;color:#7C7060;max-width:56ch}
-@media(max-width:760px){#profil .land{height:clamp(230px,34vh,300px)}
-  #profil .tag{display:none}}
+#profil .banner{overflow:hidden}
+#profil .banner img{display:block;width:118%;max-width:none;height:auto;will-change:transform;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent)}
+#profil .saga{margin-top:34px;max-width:58ch;color:#A79A88;font-size:15.5px;line-height:1.75}
+#profil .saga .s2{margin-top:12px;color:var(--gull);font-weight:600}}
 #urval .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:52px}
 #urval .cell{background:#171209;border:1px solid rgba(243,234,219,.06);border-radius:12px;
   padding:22px 12px 16px;text-align:center;transition:transform .35s var(--ease),border-color .35s}
@@ -493,13 +470,13 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
     </div>
   </div>
   <figure class="eydi">
-    <div class="land" role="img"
-         aria-label="Teiknaða eyðimörkin af miðum Ölvisholts í fullri lengd, með hellinum, torfbænum, drekanum og fossinum sem sjást ekki á dósunum">
-      <div class="track" id="ltrack" aria-hidden="true">
-        <div class="draw"></div>
-      </div>
+    <div class="banner">
+      <img src="img/teikning.jpg" alt="Teiknaða eyðimörkin af miðum Ölvisholts í fullri lengd">
     </div>
-    <figcaption class="wrapc">Dósin sýnir þér miðjuna, riddarann og steinbogann. Landið heldur áfram til beggja handa, með helli, torfbæ, dreka og fossi sem hafa aldrei komist á dós.</figcaption>
+    <figcaption class="saga wrapc">
+      <p>Á dósinni sérð þú miðju myndarinnar, riddarann og orminn í sandinum. Í fullri lengd heldur landið áfram til beggja handa, þar er hellir, torfbær, dreki á flugi og foss sem komast aldrei á dósina.</p>
+      <p class="s2">Hver bjór ber sitt brot af þessari einu mynd, í sínu bleki.</p>
+    </figcaption>
   </figure>
 </section>
 
@@ -996,6 +973,11 @@ const seamM = new THREE.MeshStandardMaterial({color:0x6e7176, metalness:1, rough
    occlusion. DoubleSide is belt-and-braces after the profile winding fix. */
 const baseM = new THREE.MeshPhysicalMaterial({color:0x3f4247, metalness:.9, roughness:.55,
   metalnessMap:brushed, envMapIntensity:.45, side:THREE.DoubleSide});
+/* the LID: without it the rim is a hollow tube and any view from above (the rise, the
+   sink, the finale) looks straight into an empty shell. A recessed brushed disc a few
+   mm below the crest is what an open-top view of a real can shows. */
+const lidM = new THREE.MeshPhysicalMaterial({color:0x585b61, metalness:.95, roughness:.55,
+  metalnessMap:brushed, envMapIntensity:.85});
 
 const loader = new THREE.TextureLoader();
 function wrapTex(slug){
@@ -1023,6 +1005,8 @@ function wrapTex(slug){
 const segs = innerWidth < 768 ? 112 : 192;
 const gB = new THREE.LatheGeometry(BARREL, segs), gT = new THREE.LatheGeometry(TOP, segs),
       gBa = new THREE.LatheGeometry(BASE, segs), gS = new THREE.LatheGeometry(SEAM, segs);
+const gL = new THREE.CircleGeometry(.229, segs);
+gL.rotateX(-Math.PI/2); gL.translate(0, 1.108, 0);   /* recessed ~4mm below the crest */
 const cans = BEERS.map(b => {
   const lm = new THREE.MeshPhysicalMaterial({color:0xd8d6d2, metalness:.06, roughness:.3,
     sheen:.05, sheenRoughness:.125, sheenColor:0xffffff,
@@ -1035,7 +1019,8 @@ const cans = BEERS.map(b => {
      The label survived only because its material is already created per can. */
   const g = new THREE.Group();
   g.add(new THREE.Mesh(gB, lm), new THREE.Mesh(gT, metal.clone()),
-        new THREE.Mesh(gBa, baseM.clone()), new THREE.Mesh(gS, seamM.clone()));
+        new THREE.Mesh(gBa, baseM.clone()), new THREE.Mesh(gS, seamM.clone()),
+        new THREE.Mesh(gL, lidM.clone()));
   g.traverse(o => { if (o.isMesh) o.castShadow = true; });
   scene.add(g);
   return g;
@@ -1145,22 +1130,58 @@ glow.rotation.x = -Math.PI/2; glow.position.y = GROUND_Y + .002; glow.renderOrde
    in the scene, so the cans stand in the landscape in three dimensions instead of being
    pasted over a strip. Additive against a near-black room means only the gold linework
    registers and there is no rectangle edge to hide. */
-const horizonTex = loader.load('img/teikning.jpg');
+/* The engraving ships as gold-on-black; desaturating it once lets material.color
+   carry the hue, so the LAND ITSELF can re-ink with the focused beer. */
+const HZ_GOLD = new THREE.Color('#E0A23A'), HZ_TMP = new THREE.Color();
+const horizonTex = loader.load('img/teikning.jpg', tex => {
+  const im = tex.image;
+  const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+  const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height), a = d.data;
+  for (let i = 0; i < a.length; i += 4){
+    const l = .2126*a[i] + .7152*a[i+1] + .0722*a[i+2];
+    a[i] = a[i+1] = a[i+2] = l;
+  }
+  x.putImageData(d, 0, 0);
+  const g = new THREE.CanvasTexture(c); g.colorSpace = THREE.SRGBColorSpace;
+  horizon.material.map = g; horizonFar.material.map = g;
+  horizon.material.needsUpdate = horizonFar.material.needsUpdate = true;
+});
 horizonTex.colorSpace = THREE.SRGBColorSpace;
-const horizon = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
-  new THREE.MeshBasicMaterial({map:horizonTex, transparent:true, opacity:.42,
-    blending:THREE.AdditiveBlending, depthWrite:false}));
-horizon.renderOrder = -1;
-scene.add(horizon);
-const HZ_Z = -4.2, HZ_RATIO = 594/1920;
-function sizeHorizon(){
-  const dist = camera.position.z - HZ_Z;
+const mkLand = (opacity) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
+    new THREE.MeshBasicMaterial({map:horizonTex, transparent:true, opacity,
+      color:HZ_GOLD.clone(), blending:THREE.AdditiveBlending, depthWrite:false}));
+  m.renderOrder = -1; scene.add(m); return m;
+};
+const horizon = mkLand(.5);          /* the near land the cans stand in */
+const horizonFar = mkLand(.16);      /* a second ridge, farther and fainter: depth */
+const HZ_Z = -4.2, HZ_FAR_Z = -7.5, HZ_RATIO = 594/1920;
+function fitLand(mesh, z, widen, lift){
+  const dist = camera.position.z - z;
   const h = 2 * Math.tan(camera.fov * Math.PI/360) * dist;
-  const pw = Math.max(h * camera.aspect * 1.6, 7);   /* wider than frame so it can drift */
-  horizon.scale.set(pw, pw * HZ_RATIO, 1);
-  horizon.position.set(0, GROUND_Y + pw * HZ_RATIO * .10, HZ_Z);
+  const pw = Math.max(h * camera.aspect * widen, 7);
+  mesh.scale.set(pw, pw * HZ_RATIO, 1);
+  mesh.position.set(mesh.position.x, GROUND_Y + pw * HZ_RATIO * lift, z);
+  mesh.userData.lift = pw * HZ_RATIO * lift;
 }
+function sizeHorizon(){ fitLand(horizon, HZ_Z, 1.6, .10); fitLand(horizonFar, HZ_FAR_Z, 1.7, .34); }
 sizeHorizon();
+
+/* dust: motes drifting through the key light, the air of the room */
+const DUST_N = innerWidth < 768 ? 90 : 170;
+const dustBase = new Float32Array(DUST_N * 3);
+for (let i = 0; i < DUST_N; i++){
+  dustBase[i*3]   = (Math.random() - .5) * 4.6;
+  dustBase[i*3+1] = GROUND_Y + Math.random() * 1.9;
+  dustBase[i*3+2] = -1.2 + Math.random() * 2.2;
+}
+const dustGeo = new THREE.BufferGeometry();
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustBase.slice(), 3));
+const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+  color:0xF3EADB, size:.014, sizeAttenuation:true, transparent:true, opacity:.3,
+  blending:THREE.AdditiveBlending, depthWrite:false}));
+scene.add(dust);
 
 const key = new THREE.SpotLight(0xffffff, 150, 9, Math.PI/4, .85, 2);
 key.position.set(-1.6, 2.7, 2.2); key.target.position.set(0, 0, 0);
@@ -1236,6 +1257,11 @@ function applyFlavorDOM(){
   document.documentElement.style.setProperty('--ink', '#' + INK.getHexString());
   glow.material.color.copy(INK);
   rim.color.copy(INK).lerp(WHITE, .6);
+  /* the LAND takes the focused beer's ink as you travel, and returns to gold when the
+     family reassembles: one desert, many inks, enacted rather than stated */
+  HZ_TMP.copy(HZ_GOLD).lerp(INK, .65 * act);
+  horizon.material.color.copy(HZ_TMP);
+  horizonFar.material.color.copy(HZ_TMP);
   if (tintScene) data.bg.copy(BLACK).lerp(INK, .12 * act);   /* black room until the journey begins */
 
   const idx = Math.round(f);
@@ -1371,12 +1397,29 @@ gsap.ticker.add(() => {
       canBoxes.push({i, left:_a.x, right:_b.x, top, bottom:_b.y, vis});
     }
   });
-  /* the horizon travels with the journey, a fraction of the carousel's own motion, so
-     the land reads as far away rather than glued to the cans */
+  /* the land travels with the journey at a fraction of the carousel's motion, the far
+     ridge slower still, so the room has true depth rather than a backdrop */
   horizon.position.x = -data.focus * .085 - ptr.cx * .05;
-  horizon.position.y = GROUND_Y + horizon.scale.y * .10 + yOff * .35;
-  horizon.material.opacity = .42 * vis0;
+  horizon.position.y = GROUND_Y + horizon.userData.lift + yOff * .35;
+  horizon.material.opacity = .5 * vis0;
   horizon.visible = vis0 > .01;
+  horizonFar.position.x = -data.focus * .038 - ptr.cx * .02;
+  horizonFar.position.y = GROUND_Y + horizonFar.userData.lift + yOff * .2;
+  horizonFar.material.opacity = .16 * vis0;
+  horizonFar.visible = horizon.visible;
+  /* dust drifts; it breathes with the same light the cans live in */
+  {
+    const dp = dust.geometry.attributes.position;
+    for (let i = 0; i < DUST_N; i++){
+      const b3 = i*3;
+      dp.array[b3]   = dustBase[b3]   + Math.sin(t*.13 + i*1.7) * .09;
+      dp.array[b3+1] = dustBase[b3+1] + Math.sin(t*.08 + i*2.1) * .06 + yOff * .25;
+      dp.array[b3+2] = dustBase[b3+2] + Math.cos(t*.11 + i*1.3) * .07;
+    }
+    dp.needsUpdate = true;
+    dust.material.opacity = .3 * vis0;
+    dust.visible = vis0 > .01;
+  }
   ground.position.y = gy;
   mirrorClip.constant = gy;
   glow.position.set(data.x, gy + .002, 0);
@@ -1424,6 +1467,9 @@ if (freshTop) {
         onStart(){ gate.style.clipPath = 'inset(0 0 0% 0)'; },
         onComplete(){ gate.classList.add('hide'); }}, .18)
       .to(data, {rise:1, duration:1.7, ease:'expo.out'}, .42)
+      /* the key light sweeps across the family as it rises: one travelling glint */
+      .fromTo(key.position, {x:2.6}, {x:-1.6, duration:1.8, ease:'power2.inOut'}, .5)
+      .fromTo(key, {intensity:340}, {intensity:150, duration:1.8, ease:'power2.out'}, .5)
       .to('#gamme h1 .w > span', {y:0, duration:.9, ease:'expo.out', stagger:.08}, .78);
   };
 } else {
@@ -1479,62 +1525,9 @@ gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%',
       never be allowed to capture an implicit start value */
   .to(data.bg, {r:.030, g:.022, b:.014, ease:'none'}, 0);
 
-/* ---------- one land, eight windows ----------
-   Ports are built in JS because each one has to carry the drawing mask offset by its
-   own position inside the track, so the engraving runs unbroken through the window. */
-{
-  const track = document.getElementById('ltrack');
-  const CAN = 'cans/olvisholt_vaegur.png';            /* silhouette only, via alpha */
-  /* every can the same size; only the vertical position varies, so the row reads as
-     one product family standing in the land rather than a perspective jumble */
-  const PORT_H = 44;                                     /* % of track height */
-  const SLOTS = [                        /* x%, y% of track; x is evenly spaced */
-    {x:12,   y:24}, {x:22.5, y:33}, {x:33,   y:21}, {x:43.5, y:32},
-    {x:54,   y:24}, {x:64.5, y:33}, {x:75,   y:22}, {x:85.5, y:31},
-  ];
-  const inks = BEERS.map((b, i) => {
-    const s = SLOTS[i];
-    const slot = document.createElement('div');
-    slot.className = 'slot';
-    slot.style.cssText = `left:${s.x}%;top:${s.y}%;height:${PORT_H}%;aspect-ratio:601/751`;
-    const port = document.createElement('div');
-    port.className = 'port';
-    port.style.webkitMaskImage = port.style.maskImage = `url(${CAN})`;
-    const ink = document.createElement('div');
-    ink.className = 'ink';
-    ink.style.background = b.ink;
-    ink.style.webkitMaskImage = ink.style.maskImage = 'url(img/teikning.jpg)';
-    const tag = document.createElement('span');
-    tag.className = 'tag'; tag.textContent = b.name;
-    port.appendChild(ink); slot.append(port, tag); track.appendChild(slot);
-    return ink;
-  });
-  const ports = [...track.querySelectorAll('.slot')];
-  /* the ink's drawing mask is sized to the TRACK and shifted by the slot's own offset,
-     otherwise every window restarts the drawing instead of continuing it */
-  function alignPorts(){
-    const t = track.getBoundingClientRect();
-    inks.forEach(el => {
-      const r = el.getBoundingClientRect();
-      const sz = `${Math.round(t.width)}px ${Math.round(t.height)}px`;
-      const pos = `${Math.round(t.left - r.left)}px ${Math.round(t.top - r.top)}px`;
-      el.style.webkitMaskSize = sz; el.style.maskSize = sz;
-      el.style.webkitMaskPosition = pos; el.style.maskPosition = pos;
-    });
-  }
-  alignPorts();
-  addEventListener('resize', alignPorts);
-  document.fonts.ready.then(alignPorts);
-
-  /* the slow pan: the whole land drifts while the section is on screen */
-  gsap.fromTo(track, {xPercent:0}, {xPercent:-16, ease:'none',
-    scrollTrigger:{trigger:'#profil .eydi', start:'top bottom', end:'bottom top',
-      scrub:1.1}});   /* no realign on scroll: slot and track move together, so the
-                          mask offset between them is invariant */
-  /* ports arrive one after another rather than all at once */
-  gsap.from(ports, {opacity:0, scale:.82, duration:.7, ease:'power3.out', stagger:.07,
-    scrollTrigger:{trigger:'#profil .land', start:'top 82%'}});
-}
+/* the banner drifts as it passes; the drawing needs nothing else */
+gsap.fromTo('#profil .banner img', {xPercent:0}, {xPercent:-13, ease:'none',
+  scrollTrigger:{trigger:'#profil .eydi', start:'top bottom', end:'bottom top', scrub:1.1}});
 
 /* ---------- seasonal fan (mechanic vendored from 21st.dev card-fan-carousel) ---------- */
 {
@@ -1641,7 +1634,8 @@ const label2 = new THREE.MeshPhysicalMaterial({metalness:.2, roughness:.26,
   reflectivity:1, ior:2, metalnessMap:brushed, envMapIntensity:1.0});
 const can2 = new THREE.Group();
 can2.add(new THREE.Mesh(gB, label2), new THREE.Mesh(gT, metal.clone()),
-         new THREE.Mesh(gBa, baseM.clone()), new THREE.Mesh(gS, seamM.clone()));
+         new THREE.Mesh(gBa, baseM.clone()), new THREE.Mesh(gS, seamM.clone()),
+         new THREE.Mesh(gL, lidM.clone()));
 can2.position.y = -.57;
 scene2.add(can2);
 /* no floor reflection here per direction — the packshot sprite shadow grounds it */
