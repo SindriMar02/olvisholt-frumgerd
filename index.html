@@ -292,14 +292,15 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
   -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);
   mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent)}
 #profil .saga{margin-top:34px;max-width:58ch;color:#A79A88;font-size:15.5px;line-height:1.75}
-#profil .saga .s2{margin-top:12px;color:var(--gull);font-weight:600}}
-#urval .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:52px}
+#profil .saga .s2{margin-top:12px;color:var(--gull);font-weight:600}
+/* the year-round eight in one calm band; the seasonal five live in the fan above */
+#urval .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px;margin-top:44px}
 #urval .cell{background:#171209;border:1px solid rgba(243,234,219,.06);border-radius:12px;
-  padding:22px 12px 16px;text-align:center;transition:transform .35s var(--ease),border-color .35s}
-#urval .cell:hover{transform:translateY(-6px);border-color:rgba(243,234,219,.22)}
-#urval .cell img{height:185px;object-fit:contain;margin:0 auto 14px}
-#urval .cell .n{font-weight:700;font-size:15px}
-#urval .cell .a{font-size:13px;color:var(--al);margin-top:2px}
+  padding:16px 10px 13px;text-align:center;transition:transform .35s var(--ease),border-color .35s}
+#urval .cell:hover{transform:translateY(-5px);border-color:rgba(243,234,219,.22)}
+#urval .cell img{height:118px;object-fit:contain;margin:0 auto 10px}
+#urval .cell .n{font-weight:700;font-size:13px;line-height:1.25}
+#urval .cell .a{font-size:12px;color:var(--al);margin-top:2px}
 
 /* ---------- sermerking ---------- */
 #merki{padding:16vh 0 10vh;min-height:100dvh;display:grid;align-content:center}
@@ -545,7 +546,7 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
 <!-- full range -->
 <section id="urval">
   <div class="wrapc">
-    <h2>Öll línan</h2>
+    <h2>Árslínan, alltaf til</h2>
     <div class="grid" id="ugrid"></div>
   </div>
 </section>
@@ -809,7 +810,7 @@ document.getElementById('gno').onclick = () => {
 /* grids: their real can photography */
 const cell = b => `<div class="cell"><img loading="lazy" src="cans/${b.slug}.png"
    alt="${b.name} 33cl dós"><div class="n">${b.name}</div><div class="a">${b.abv}</div></div>`;
-document.getElementById('ugrid').innerHTML = ALL.map(cell).join('');
+document.getElementById('ugrid').innerHTML = BEERS.map(cell).join('');
 
 /* news index + pointer preview (built outside the 3D branch so it works everywhere) */
 document.getElementById('feed').innerHTML = NEWS.map(n =>
@@ -976,8 +977,10 @@ const baseM = new THREE.MeshPhysicalMaterial({color:0x3f4247, metalness:.9, roug
 /* the LID: without it the rim is a hollow tube and any view from above (the rise, the
    sink, the finale) looks straight into an empty shell. A recessed brushed disc a few
    mm below the crest is what an open-top view of a real can shows. */
-const lidM = new THREE.MeshPhysicalMaterial({color:0x585b61, metalness:.95, roughness:.55,
-  metalnessMap:brushed, envMapIntensity:.85});
+const lidM = new THREE.MeshPhysicalMaterial({color:0x8e9197, metalness:.95, roughness:.34,
+  metalnessMap:brushed, envMapIntensity:1.25});
+const tabM = new THREE.MeshPhysicalMaterial({color:0x74777d, metalness:.95, roughness:.4,
+  metalnessMap:brushed, envMapIntensity:1.0});
 
 const loader = new THREE.TextureLoader();
 function wrapTex(slug){
@@ -1005,8 +1008,20 @@ function wrapTex(slug){
 const segs = innerWidth < 768 ? 112 : 192;
 const gB = new THREE.LatheGeometry(BARREL, segs), gT = new THREE.LatheGeometry(TOP, segs),
       gBa = new THREE.LatheGeometry(BASE, segs), gS = new THREE.LatheGeometry(SEAM, segs);
-const gL = new THREE.CircleGeometry(.229, segs);
-gL.rotateX(-Math.PI/2); gL.translate(0, 1.108, 0);   /* recessed ~4mm below the crest */
+/* a REAL can end, not a disc: rolled rim lip, steep countersink wall, then the
+   near-flat centre panel with a slight dome, plus the stay-tab and its rivet.
+   Profile ordered centre-out / bottom-up so the lathe normals face UP (the BASE
+   winding lesson). Bright alloy so the panel carries a specular sweep at grazing
+   angles, which is what a can top actually looks like when you look across it. */
+const END_PTS = [[23.4,113.3],[23.1,113.0],[22.8,112.0],[22.5,111.0],[21.9,110.3],
+                 [20.6,110.2],[14,110.5],[6,110.8],[0,110.9]];
+/* rim-to-centre order: the OTHER way winds the surface inward and the whole end goes
+   lightless, the same trap the BASE dome hit */
+const gL = new THREE.LatheGeometry(END_PTS.map(([r,y]) => new THREE.Vector2(r*.01, y*.01)), segs);
+const gTab = new THREE.CylinderGeometry(.052, .052, .006, 40);
+gTab.scale(1, 1, 1.75); gTab.translate(.055, 1.113, 0);
+const gRivet = new THREE.CylinderGeometry(.016, .016, .009, 24);
+gRivet.translate(0, 1.113, 0);
 const cans = BEERS.map(b => {
   const lm = new THREE.MeshPhysicalMaterial({color:0xd8d6d2, metalness:.06, roughness:.3,
     sheen:.05, sheenRoughness:.125, sheenColor:0xffffff,
@@ -1020,7 +1035,8 @@ const cans = BEERS.map(b => {
   const g = new THREE.Group();
   g.add(new THREE.Mesh(gB, lm), new THREE.Mesh(gT, metal.clone()),
         new THREE.Mesh(gBa, baseM.clone()), new THREE.Mesh(gS, seamM.clone()),
-        new THREE.Mesh(gL, lidM.clone()));
+        new THREE.Mesh(gL, lidM.clone()), new THREE.Mesh(gTab, tabM.clone()),
+        new THREE.Mesh(gRivet, tabM.clone()));
   g.traverse(o => { if (o.isMesh) o.castShadow = true; });
   scene.add(g);
   return g;
@@ -1198,6 +1214,10 @@ scene.add(under, under.target);
 /* edge separation only — narrow, from behind, so it never fills the dark limb */
 const rim = new THREE.SpotLight(0xffffff, 90, 10, Math.PI/7, .55, 2);
 rim.position.set(1.5, 1.7, -2.4); scene.add(rim, rim.target);
+/* zenith: the HDR strips live at the horizon, so up-facing surfaces (can ENDS,
+   shoulders) caught nothing and read as rubber. A soft warm downlight is the sky. */
+const zenith = new THREE.DirectionalLight(0xfff0dd, .85);
+zenith.position.set(.3, 4, .6); scene.add(zenith, zenith.target);
 
 /* Post: a half-res UnrealBloom at threshold 1 so ONLY the true HDR highlights bloom.
    ciao runs 0.1/0.1/1 through an EffectComposer; without it, high-range speculars
@@ -1635,7 +1655,8 @@ const label2 = new THREE.MeshPhysicalMaterial({metalness:.2, roughness:.26,
 const can2 = new THREE.Group();
 can2.add(new THREE.Mesh(gB, label2), new THREE.Mesh(gT, metal.clone()),
          new THREE.Mesh(gBa, baseM.clone()), new THREE.Mesh(gS, seamM.clone()),
-         new THREE.Mesh(gL, lidM.clone()));
+         new THREE.Mesh(gL, lidM.clone()), new THREE.Mesh(gTab, tabM.clone()),
+         new THREE.Mesh(gRivet, tabM.clone()));
 can2.position.y = -.57;
 scene2.add(can2);
 /* no floor reflection here per direction — the packshot sprite shadow grounds it */
@@ -1653,6 +1674,8 @@ const u2 = new THREE.SpotLight(0xffffff,5.5,8,Math.PI/3,1,.1);
 u2.position.set(0,-3,2); u2.target.position.set(0,0,1.8); scene2.add(u2,u2.target);
 const rim2 = new THREE.SpotLight(0xffffff,7,12,Math.PI/3,.9,.1);
 rim2.position.set(.9,1.9,-3.0); scene2.add(rim2,rim2.target);
+const zen2 = new THREE.DirectionalLight(0xfff0dd,.85); zen2.position.set(.3,4,.6);
+scene2.add(zen2, zen2.target);
 
 /* ---------- sérmerking configurator ----------
    Four live controls: headline, sub line, which beer's ink the label is printed in,
