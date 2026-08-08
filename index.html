@@ -1130,6 +1130,9 @@ if (freshTop) {
   const tlIn = gsap.timeline({delay:.15})
     .to('#gamme h1 .w > span', {y:0, duration:.9, ease:'expo.out', stagger:.08});
   if (scrollY < innerHeight * 1.5) tlIn.to(data, {opacity:1, duration:.8, ease:'power2.out'}, '-=.5');
+  /* reload deeper in the journey: the stage must simply BE on — no tween — and the
+     profil exit scrub (created after this) owns opacity from there down */
+  else if (scrollY < document.getElementById('profil').offsetTop) data.opacity = 1;
 }
 
 /* ---------- THE journey: one pass, all eight beers, nothing revisited ----------
