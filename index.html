@@ -88,7 +88,8 @@ nav .mark{display:block}
 nav .mark img{height:58px;width:auto;display:block;transition:opacity .2s}
 nav .mark:hover img{opacity:.85}
 nav .links{display:flex;gap:26px;font-size:14px;font-weight:500;align-items:center}
-nav .links a{text-decoration:none;opacity:.7;transition:opacity .2s}
+nav .links a{display:flex;align-items:center;min-height:44px;text-decoration:none;
+  opacity:.7;transition:opacity .2s}
 nav .links a:hover,nav .links a:focus-visible{opacity:1}
 nav .links a.cta{border:1px solid rgba(243,234,219,.4);border-radius:999px;padding:9px 18px;opacity:1}
 nav .links a.cta:hover{border-color:var(--gull);color:var(--gull)}
@@ -203,6 +204,13 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
   #arstid .fan{height:auto;flex-wrap:wrap;gap:12px}
   #arstid .fcard{position:static;transform:none !important}
 }
+/* a fanned hand needs width it does not have on a phone: stack it instead */
+@media (max-width:820px){
+  #arstid .fan{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  #arstid .fcard{position:static;width:auto;transform:none !important;opacity:1 !important;
+    box-shadow:none;border-radius:14px;padding:16px 10px 12px}
+  #arstid .fcard img{height:clamp(120px,18vh,160px)}
+}
 
 /* ---------- water ---------- */
 #vatn{padding:14vh 0;background:#100E09}
@@ -259,13 +267,16 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
   letter-spacing:.02em;font-size:clamp(1.25rem,2.6vw,2rem);line-height:1.05}
 #frettir .go{font-size:13px;color:#7C7060;white-space:nowrap}
 #frettir a.item:hover .go,#frettir a.item:focus-visible .go{color:var(--gull)}
+/* parked off-screen: cx/cy start at 0, and Chrome fires pointerenter when content
+   scrolls under a stationary cursor, which flashed this panel in the top-left corner */
 #frettir .peek{position:fixed;top:0;left:0;width:210px;height:250px;pointer-events:none;
   z-index:20;opacity:0;border-radius:14px;overflow:hidden;background:#171209;
+  transform:translate3d(-9999px,-9999px,0);
   border:1px solid rgba(243,234,219,.12);will-change:transform,opacity}
 /* a background image, not an <img>: an empty <img> src counts as a broken image */
 #frettir .peek{background-repeat:no-repeat;background-position:center;background-size:cover}
 @media(hover:none),(prefers-reduced-motion:reduce){#frettir .peek{display:none}}
-@media(max-width:640px){#frettir a.item{grid-template-columns:1fr;gap:6px}
+@media(max-width:640px){#frettir a.item{grid-template-columns:1fr;gap:6px;min-height:56px}
   #frettir .go{display:none}}
 
 /* ---------- contact ---------- */
@@ -277,7 +288,8 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
   padding:26px 24px;display:grid;gap:6px;align-content:start}
 #samband .who{font-family:var(--disp);font-weight:600;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em}
 #samband .role{color:var(--gull);font-size:14px;font-weight:600;margin-bottom:8px}
-#samband a{color:#DCD1BF;text-decoration:none;font-size:15px;width:max-content}
+#samband a{display:flex;align-items:center;min-height:44px;color:#DCD1BF;
+  text-decoration:none;font-size:15px;width:max-content}
 #samband a:hover,#samband a:focus-visible{color:var(--lakk);text-decoration:underline}
 
 /* ---------- full range ---------- */
@@ -325,11 +337,12 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 #merki .pick{border:0;padding:0;margin:0}
 #merki .pick legend{font-weight:700;font-size:14px;padding:0;margin-bottom:10px}
 #merki .swatches{display:flex;gap:9px;flex-wrap:wrap}
-#merki .swatches button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;
+/* the dot stays 34px; the touch area is 44px, which is the real requirement */
+#merki .swatches button{width:44px;height:44px;border-radius:50%;border:5px solid transparent;
   padding:0;cursor:pointer;transition:transform .2s var(--ease),border-color .2s;
-  outline-offset:3px}
+  background-clip:content-box;outline-offset:2px}
 #merki .swatches button:hover{transform:scale(1.12)}
-#merki .swatches button[aria-pressed="true"]{border-color:var(--lakk);transform:scale(1.12)}
+#merki .swatches button[aria-pressed="true"]{border-color:var(--lakk);border-width:3px;transform:scale(1.1)}
 #merki .segs{display:flex;gap:8px}
 #merki .segs button{border:1px solid rgba(243,234,219,.22);background:transparent;color:#DCD1BF;
   border-radius:999px;padding:9px 18px;font-weight:600;font-size:14px;cursor:pointer;
@@ -369,7 +382,8 @@ footer .fbrand p{margin-top:20px;color:#A79A88;max-width:34ch;line-height:1.7}
 footer .fcols{display:grid;grid-template-columns:repeat(3,auto);gap:clamp(28px,4.5vw,84px)}
 footer .fcols h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;letter-spacing:.08em;
   color:var(--gull);margin-bottom:14px}
-footer .fcols a{display:block;color:#DCD1BF;text-decoration:none;padding:5px 0;width:max-content}
+footer .fcols a{display:flex;align-items:center;min-height:44px;min-width:44px;color:#DCD1BF;
+  text-decoration:none;width:max-content}
 footer .fcols a:hover,footer .fcols a:focus-visible{color:var(--lakk);text-decoration:underline}
 footer .fline{height:1px;background:rgba(243,234,219,.09);margin:56px 0 26px}
 footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#7C7060;font-size:13px}
@@ -776,7 +790,7 @@ const ALL = [...BEERS, ...SEASON];
    shows the real Grandatröð brewhouse instead. */
 const NEWS = [
   {t:'Sumarbjórinn Birta',    d:'17. apríl 2025',     u:'https://olvisholt.is/sumarbjorinn-birta/',      img:'img/news/birta.jpg'},
-  {t:'Kolsýrt vatn',          d:'18. febrúar 2025',   u:'https://olvisholt.is/kolsyrt-vatn/',            img:'img/vatn/vatn-plain.png'},
+  {t:'Kolsýrt vatn',          d:'18. febrúar 2025',   u:'https://olvisholt.is/kolsyrt-vatn/',            img:'img/news/vatn.jpg'},
   {t:'Pretzie Októberfest',   d:'6. september 2024',  u:'https://olvisholt.is/pretzie-oktoberfest-bjor/',img:'img/news/pretzie.jpg'},
   {t:'Páskabjór',             d:'23. febrúar 2024',   u:'https://olvisholt.is/paskabjor/',               img:'img/news/paskar.jpg'},
   {t:'Jólabjór 2024',         d:'1. nóvember 2023',   u:'https://olvisholt.is/jolabjor-2024/',           img:'img/news/jola2024.jpg'},
@@ -827,10 +841,15 @@ document.getElementById('feed').innerHTML = NEWS.map(n =>
   };
   document.querySelectorAll('#frettir a.item').forEach(a => {
     a.addEventListener('pointerenter', e => {
-      if (e.pointerType !== 'mouse') return;
+      /* a real hover always carries coordinates; a scroll-induced enter at the origin
+         does not, and must not drag the panel into the corner */
+      if (e.pointerType !== 'mouse' || (e.clientX <= 0 && e.clientY <= 0)) return;
       peek.style.backgroundImage = `url("${a.dataset.img}")`;
+      px = e.clientX + 24; py = e.clientY - 125;
+      if (!raf) { cx = px; cy = py; }              /* place BEFORE showing */
+      peek.style.transform = `translate3d(${cx}px,${cy}px,0)`;
       on = true; peek.style.opacity = '1';
-      if (!raf) { cx = e.clientX + 24; cy = e.clientY - 125; raf = requestAnimationFrame(loop); }
+      if (!raf) raf = requestAnimationFrame(loop);
     });
     a.addEventListener('pointermove', e => { px = e.clientX + 24; py = e.clientY - 125; });
     a.addEventListener('pointerleave', () => { on = false; peek.style.opacity = '0'; });
@@ -1552,6 +1571,9 @@ gsap.fromTo('#profil .banner img', {xPercent:0}, {xPercent:-13, ease:'none',
 /* ---------- seasonal fan (mechanic vendored from 21st.dev card-fan-carousel) ---------- */
 {
   const fcards = [...document.querySelectorAll('#sfan .fcard')];
+  /* below 760 the CSS stacks these into a grid; running the fan maths on top would
+     fight it with inline transforms, so the whole gesture simply does not apply */
+  const fanOK = matchMedia('(min-width:821px)');
   const N = fcards.length, C = (N - 1) / 2;
   const mult = () => innerWidth < 480 ? .30 : innerWidth < 768 ? .5 : innerWidth < 1024 ? .75 : 1;
   const slotOf = s => {
@@ -1559,11 +1581,11 @@ gsap.fromTo('#profil .banner img', {xPercent:0}, {xPercent:-13, ease:'none',
     return { rot: d * 21, scale: 1 - .2244 * ad * ad,
              x: d * 21 * mult(), y: ad * ad * 6.2, z: 10 - Math.abs(s - C) };
   };
-  fcards.forEach((el, s) => {
+  if (fanOK.matches) fcards.forEach((el, s) => {
     const p = slotOf(s);
     gsap.set(el, {x: p.x + 'rem', y: (p.y + 12) + 'rem', rotation: 0, scale: .5, opacity: 0, zIndex: p.z});
   });
-  ScrollTrigger.create({
+  if (fanOK.matches) ScrollTrigger.create({
     trigger: '#sfan', start: 'top 78%', once: true,
     onEnter(){
       fcards.forEach((el, s) => {
@@ -1593,8 +1615,10 @@ gsap.fromTo('#profil .banner img', {xPercent:0}, {xPercent:-13, ease:'none',
       gsap.set(el, {zIndex: hovered === s ? 20 : slotOf(s).z});
     });
   };
-  fcards.forEach((el, s) => el.addEventListener('pointerenter', () => spread(s)));
-  document.getElementById('sfan').addEventListener('pointerleave', () => spread(null));
+  if (fanOK.matches) {
+    fcards.forEach((el, s) => el.addEventListener('pointerenter', () => spread(s)));
+    document.getElementById('sfan').addEventListener('pointerleave', () => spread(null));
+  }
 }
 
 /* ---------- reveals ---------- */
