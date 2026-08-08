@@ -223,7 +223,9 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 #salur{padding:15vh 0}
 #salur h2{font-size:clamp(2.2rem,5.4vw,4.2rem);max-width:14ch}
 #salur .halls{display:grid;grid-template-columns:1.4fr .9fr 1.2fr;gap:10px;margin-top:44px}
-#salur .halls figure{overflow:clip;border-radius:14px;aspect-ratio:4/3}
+/* grid items default to min-width:auto, so a 1400px-wide photo refuses to shrink
+   and blows the row out past the viewport */
+#salur .halls figure{overflow:clip;border-radius:14px;aspect-ratio:4/3;min-width:0}
 #salur .halls img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease)}
 #salur .halls figure:hover img{transform:scale(1.05)}
 @media(max-width:860px){#salur .halls{grid-template-columns:1fr 1fr}
