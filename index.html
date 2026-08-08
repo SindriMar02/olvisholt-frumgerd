@@ -344,6 +344,20 @@ figure figcaption{margin-top:12px;font-size:14px;color:#A79A88}
 #merki input::placeholder{color:#7C7060}
 #merki input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 #merki .hint{font-size:14px;color:#A79A88;max-width:44ch}
+#merki .pick{border:0;padding:0;margin:0}
+#merki .pick legend{font-weight:700;font-size:14px;padding:0;margin-bottom:10px}
+#merki .swatches{display:flex;gap:9px;flex-wrap:wrap}
+#merki .swatches button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;
+  padding:0;cursor:pointer;transition:transform .2s var(--ease),border-color .2s;
+  outline-offset:3px}
+#merki .swatches button:hover{transform:scale(1.12)}
+#merki .swatches button[aria-pressed="true"]{border-color:var(--lakk);transform:scale(1.12)}
+#merki .segs{display:flex;gap:8px}
+#merki .segs button{border:1px solid rgba(243,234,219,.22);background:transparent;color:#DCD1BF;
+  border-radius:999px;padding:9px 18px;font-weight:600;font-size:14px;cursor:pointer;
+  transition:background .25s,color .25s,border-color .25s}
+#merki .segs button.on{background:var(--lakk);color:var(--myrkur);border-color:var(--lakk)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 #merki .mail{margin-top:10px;display:inline-block;width:max-content;background:var(--lakk);color:var(--myrkur);
   text-decoration:none;border-radius:999px;padding:15px 28px;font-weight:700;transition:transform .16s var(--ease)}
 #merki .mail:active{transform:scale(.97)}
@@ -575,10 +589,27 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
     </div>
     <div class="play">
       <form onsubmit="return false">
-        <label for="evt">Skrifaðu tilefnið og sjáðu það á dósinni</label>
+        <label for="evt">Tilefnið</label>
         <input id="evt" name="evt" autocomplete="off" maxlength="22" placeholder="Brúðkaup Önnu og Bjarka">
+
+        <label for="evt2">Undirlína</label>
+        <input id="evt2" name="evt2" autocomplete="off" maxlength="26" placeholder="14. júní 2026">
+
+        <fieldset class="pick">
+          <legend>Blekið</legend>
+          <div class="swatches" id="inkpick"></div>
+        </fieldset>
+
+        <fieldset class="pick">
+          <legend>Letur</legend>
+          <div class="segs" id="fontpick">
+            <button type="button" data-f="disp" class="on">Þykkt</button>
+            <button type="button" data-f="body">Fínlegt</button>
+          </div>
+        </fieldset>
+
         <p class="hint rv">Fyrirtæki, brúðkaup, afmæli og partý geta fengið sérmerktar dósir eða flöskur með eigin hönnun á gæðabjór frá Ölvisholti.</p>
-        <a class="mail" href="mailto:olvisholt@olvisholt.is?subject=S%C3%A9rmerktur%20bj%C3%B3r">Fá tilboð í sérmerkingu</a>
+        <a class="mail" id="merkimail" href="mailto:olvisholt@olvisholt.is?subject=S%C3%A9rmerktur%20bj%C3%B3r">Fá tilboð í sérmerkingu</a>
       </form>
       <div class="canhold" id="merkihold"></div>
     </div>
@@ -1599,44 +1630,112 @@ u2.position.set(0,-3,2); u2.target.position.set(0,0,1.8); scene2.add(u2,u2.targe
 const rim2 = new THREE.SpotLight(0xffffff,7,12,Math.PI/3,.9,.1);
 rim2.position.set(.9,1.9,-3.0); scene2.add(rim2,rim2.target);
 
-const baseWrap = new Image();
-baseWrap.src = 'wraps/olvisholt_whiteale_wrap.jpg';
+/* ---------- sérmerking configurator ----------
+   Four live controls: headline, sub line, which beer's ink the label is printed in,
+   and the letterform. Every wrap is cached so switching ink is instant and never
+   disposes a texture that is still bound (that leaves garbage on the mesh). */
+const merki = {text:'', sub:'', beer:1, font:'disp'};
+const wrapCache = new Map();
+function getWrap(slug){
+  if (wrapCache.has(slug)) return wrapCache.get(slug);
+  const im = new Image();
+  im.onload = () => drawMerki();
+  im.src = `wraps/${slug}_wrap.jpg`;
+  wrapCache.set(slug, im);
+  return im;
+}
 const mc = document.createElement('canvas'); mc.width = 2048; mc.height = 1024;
 const mx = mc.getContext('2d');
 const merkiTex = new THREE.CanvasTexture(mc);
 merkiTex.colorSpace = THREE.SRGBColorSpace; merkiTex.wrapS = THREE.RepeatWrapping;
 merkiTex.center.set(.5,.5); merkiTex.offset.x = .5;
-function drawMerki(text){
-  if (!baseWrap.complete) return;
-  mx.drawImage(baseWrap, 0, 0, 2048, 1024);
-  if (text) {
+
+function drawMerki(){
+  const beer = BEERS[merki.beer];
+  const img = getWrap(beer.slug);
+  if (!img.complete || !img.naturalWidth) return;
+  mx.drawImage(img, 0, 0, 2048, 1024);
+  if (merki.text || merki.sub) {
     mx.save();
-    /* lacquer patch over the printed WHITE ALE block so the custom name owns the zone */
+    /* lacquer patch over the printed name block so the custom text owns the zone */
     const grd = mx.createLinearGradient(0, 330, 0, 660);
     grd.addColorStop(0, 'rgba(242,241,238,0)');
     grd.addColorStop(.13, '#F2F1EE');
     grd.addColorStop(.88, '#F2F1EE');
     grd.addColorStop(1, 'rgba(242,241,238,0)');
     mx.fillStyle = grd; mx.fillRect(520, 330, 1008, 330);
-    mx.textAlign = 'center'; mx.fillStyle = '#1C1B19';
-    const size = Math.min(120, 1600/Math.max(6,text.length)*1.7);
-    mx.font = `700 ${size}px 'Khand', sans-serif`;
-    mx.fillText(text.toUpperCase(), 1024, 470, 700);
-    mx.font = `500 34px Satoshi, sans-serif`;
-    mx.fillStyle = '#19ABC7';
-    mx.fillText('SÉRMERKT AF ÖLVISHOLTI', 1024, 530, 600);
+    mx.textAlign = 'center';
+
+    if (merki.text) {
+      mx.fillStyle = '#1C1B19';
+      const t = merki.font === 'disp' ? merki.text.toUpperCase() : merki.text;
+      const size = merki.font === 'disp'
+        ? Math.min(120, 1600/Math.max(6, t.length) * 1.7)
+        : Math.min(92,  1400/Math.max(6, t.length) * 1.55);
+      mx.font = merki.font === 'disp'
+        ? `700 ${size}px 'Khand', sans-serif`
+        : `700 ${size}px Satoshi, sans-serif`;
+      mx.fillText(t, 1024, merki.sub ? 460 : 485, 760);
+    }
+    if (merki.sub) {
+      mx.fillStyle = beer.ink;
+      mx.font = `500 40px Satoshi, sans-serif`;
+      mx.fillText(merki.sub, 1024, merki.text ? 528 : 495, 700);
+    }
+    mx.fillStyle = beer.ink;
+    mx.font = `600 28px Satoshi, sans-serif`;
+    mx.fillText('SÉRMERKT AF ÖLVISHOLTI', 1024, 600, 620);
     mx.restore();
   }
   merkiTex.needsUpdate = true;
+  label2.map = merkiTex; label2.needsUpdate = true;
 }
-baseWrap.onload = () => { drawMerki(''); label2.map = merkiTex; label2.needsUpdate = true; };
-let deb;
-document.getElementById('evt').addEventListener('input', e => {
-  clearTimeout(deb); deb = setTimeout(()=>drawMerki(e.target.value.trim()), 90);
+
+/* ink swatches: one per beer, because an ink IS one of their beers */
+const inkpick = document.getElementById('inkpick');
+inkpick.innerHTML = BEERS.map((b,i) =>
+  `<button type="button" data-i="${i}" style="background:${b.ink}"
+     aria-pressed="${i===merki.beer}" title="${b.name}"><span class="sr">${b.name}</span></button>`).join('');
+inkpick.addEventListener('click', e => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  merki.beer = +btn.dataset.i;
+  [...inkpick.children].forEach(c => c.setAttribute('aria-pressed', c === btn));
+  drawMerki(); updateMerkiMail();
 });
-/* refresh trap: if Khand finishes loading after the first draw, the canvas keeps the
-   fallback font forever — redraw once fonts settle */
-document.fonts.ready.then(() => drawMerki(document.getElementById('evt').value.trim()));
+const fontpick = document.getElementById('fontpick');
+fontpick.addEventListener('click', e => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  merki.font = btn.dataset.f;
+  [...fontpick.children].forEach(c => c.classList.toggle('on', c === btn));
+  drawMerki();
+});
+/* the enquiry carries whatever they configured, so it lands as a real brief */
+const merkimail = document.getElementById('merkimail');
+function updateMerkiMail(){
+  const b = BEERS[merki.beer];
+  const body = `Halló,\n\nMig langar að fá tilboð í sérmerktan bjór.\n\n`
+    + `Tilefni: ${merki.text || '(vantar)'}\n`
+    + `Undirlína: ${merki.sub || '(engin)'}\n`
+    + `Bjór: ${b.name} ${b.abv}\n\nTakk fyrir.`;
+  merkimail.href = 'mailto:olvisholt@olvisholt.is?subject='
+    + encodeURIComponent('Sérmerktur bjór') + '&body=' + encodeURIComponent(body);
+}
+updateMerkiMail();
+
+let deb;
+const onField = () => {
+  clearTimeout(deb);
+  deb = setTimeout(() => {
+    merki.text = document.getElementById('evt').value.trim();
+    merki.sub  = document.getElementById('evt2').value.trim();
+    drawMerki(); updateMerkiMail();
+  }, 90);
+};
+document.getElementById('evt').addEventListener('input', onField);
+document.getElementById('evt2').addEventListener('input', onField);
+/* if Khand lands after the first draw the canvas keeps the fallback font forever */
+document.fonts.ready.then(drawMerki);
+drawMerki();
 function sizeMerki(){
   const r = hold.getBoundingClientRect();
   if (r.width < 10) return;
