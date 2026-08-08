@@ -111,6 +111,8 @@ section{position:relative;z-index:10}
 #gamme h1 .w{display:inline-block;overflow:hidden;vertical-align:top;
   padding:.16em .03em .09em;margin:-.16em -.03em -.09em}
 #gamme h1 .w>span{display:inline-block;transform:translateY(135%)}
+/* each letter is coloured independently from the pixels behind it (see wordmark ink) */
+#gamme h1 i{font-style:normal;display:inline-block;color:var(--lakk)}
 
 /* ---------- the journey rail: one continuous pass through the range ---------- */
 /* width:100% is load-bearing: .wrapc's margin auto disables grid stretch, the strip
@@ -246,8 +248,29 @@ figure figcaption{margin-top:12px;font-size:14px;color:#9a9890}
 /* ---------- full range ---------- */
 #urval{padding:16vh 0;background:#0d0d0f}
 #urval h2{font-size:clamp(2.2rem,5vw,4rem);max-width:16ch}
-#urval .teikn{margin-top:44px}
-#urval .teikn .imgw{aspect-ratio:1920/594;background:#0d0d0f}
+/* ---------- the re-inking desert ----------
+   The illustration is used as a luminance MASK, not as a picture: the gold linework
+   becomes the aperture and a band carrying all eight beer inks slides underneath it.
+   Same desert, many inks, which is exactly what the heading claims. The band moves
+   on transform (GPU) rather than background-position (paint). */
+#profil .eydi{margin-top:clamp(48px,9vh,110px)}
+#profil .eydiw{position:relative;overflow:hidden;aspect-ratio:1920/594;
+  -webkit-mask-image:url(img/teikning.jpg); mask-image:url(img/teikning.jpg);
+  -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  -webkit-mask-mode:luminance; mask-mode:luminance}
+/* the engraved lines are thin and only mid-luminance, so the mask hands through a lot
+   of partial alpha: the band is brightened to keep the ink readable through it */
+#profil .eydiw .band{position:absolute;inset:0;width:200%;will-change:transform;
+  filter:brightness(1.55) saturate(1.12);
+  background:linear-gradient(90deg,#C13F4A,#19ABC7,#4B8139,#D7A91A,#BAAA85,#6189A7,
+    #CA9124,#8E9096,#C13F4A,#19ABC7,#4B8139,#D7A91A,#BAAA85,#6189A7,#CA9124,#8E9096)}
+#profil .eydi figcaption{margin-top:20px;font-size:14px;color:#6d6b66}
+/* no mask support: fall back to the illustration as shipped */
+@supports not ((mask-mode:luminance) or (-webkit-mask-mode:luminance)){
+  #profil .eydiw{background:url(img/teikning.jpg) center/cover}
+  #profil .eydiw .band{display:none}
+}
 #urval .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:52px}
 #urval .cell{background:#131316;border:1px solid rgba(245,244,241,.06);border-radius:12px;
   padding:22px 12px 16px;text-align:center;transition:transform .35s var(--ease),border-color .35s}
@@ -376,7 +399,8 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
   <div class="hold">
     <div class="wrapc">
       <h1 aria-label="Ölvisholt">
-        <span class="w"><span>ÖLVIS</span></span><span class="w"><span>HOLT</span></span>
+        <span class="w" aria-hidden="true"><span><i>Ö</i><i>L</i><i>V</i><i>I</i><i>S</i></span></span><span
+             class="w" aria-hidden="true"><span><i>H</i><i>O</i><i>L</i><i>T</i></span></span>
       </h1>
     </div>
     <div class="wrapc strip">
@@ -398,6 +422,13 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
       <p class="rv">Allir bjórar línunnar bera sömu teiknuðu eyðimörkina. Hver bjór fær sitt blek, sama landið, sami riddarinn, sami ormurinn í sandinum.</p>
     </div>
   </div>
+  <figure class="eydi">
+    <div class="eydiw" role="img"
+         aria-label="Eyðimerkurteikningin af miðum Ölvisholts, riddari og ormur í sandinum, í blekum allrar línunnar">
+      <div class="band" aria-hidden="true"></div>
+    </div>
+    <figcaption class="wrapc">Sama teikningin, átta blek. Skrunaðu og sjáðu hana skipta um lit.</figcaption>
+  </figure>
 </section>
 
 <!-- seasonal line -->
@@ -453,9 +484,7 @@ footer .fbase{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap
 <!-- full range -->
 <section id="urval">
   <div class="wrapc">
-    <h2>Öll línan, sama eyðimörkin</h2>
-    <figure class="teikn"><div class="imgw"><img loading="lazy" src="img/teikning.jpg" alt="Eyðimerkurteikningin af miðum Ölvisholts, riddari og ormur í sandinum"></div>
-      <figcaption>Teikningin af miðanum, hver bjór fær sitt blek</figcaption></figure>
+    <h2>Öll línan</h2>
     <div class="grid" id="ugrid"></div>
   </div>
 </section>
@@ -1025,6 +1054,56 @@ function applyFlavorDOM(){
 }
 let tintScene = true;
 
+/* ---------- wordmark ink ----------
+   Each letter of ÖLVISHOLT is printed in the ink of the beer standing behind IT,
+   so the word carries several inks at once as the row slides past.
+   Deliberately NOT sampled from the framebuffer: readPixels on the default
+   framebuffer measured 11.9ms per call against 1.05ms for the whole render, a stall
+   an order of magnitude worse than the thing it was inspecting. We already know
+   exactly where every can is, so the occlusion is projected instead. Free, exact,
+   and it can use each can's own ink rather than the focused one. */
+const wmLetters = [...document.querySelectorAll('#gamme h1 i')];
+const LACQUER = new THREE.Color('#F5F4F1');
+const INKS_DARK = BEERS.map(b => new THREE.Color(b.ink).multiplyScalar(.55));
+const wmCur = wmLetters.map(() => new THREE.Color('#F5F4F1'));
+const wmTgt = wmLetters.map(() => new THREE.Color('#F5F4F1'));
+const canBoxes = [];
+const PRJ = new THREE.Vector3();
+const CAN_R = .33, CAN_TOP = 1.15;
+let wmBox = null;
+function measureWordmark(){
+  const h1 = document.querySelector('#gamme h1');
+  const hb = h1.getBoundingClientRect();
+  const rects = wmLetters.map(el => el.getBoundingClientRect());
+  wmBox = (hb.width > 10 && rects.every(r => r.width > 0)) ? {rects} : null;
+}
+function projTo(x, y, z, out){
+  PRJ.set(x, y, z).project(camera);
+  out.x = (PRJ.x * .5 + .5) * innerWidth;
+  out.y = (1 - (PRJ.y * .5 + .5)) * innerHeight;
+}
+const _a = {x:0,y:0}, _b = {x:0,y:0}, PRJ2 = {x:0,y:0};
+function inkWordmark(){
+  if (!wmBox) return;
+  const lit = data.opacity > .05;
+  for (let i = 0; i < wmLetters.length; i++){
+    const r = wmBox.rects[i];
+    let best = 0, bestIdx = -1;
+    if (lit) for (const bx of canBoxes){
+      if (bx.bottom < r.top || bx.top > r.bottom) continue;
+      const ov = Math.min(bx.right, r.right) - Math.max(bx.left, r.left);
+      if (ov <= 0) continue;
+      const cov = Math.min(1, ov / r.width) * bx.vis;
+      if (cov > best){ best = cov; bestIdx = bx.i; }
+    }
+    if (best > .04 && bestIdx >= 0){
+      const t = Math.min(1, best * 1.4), s = t*t*(3 - 2*t);
+      wmTgt[i].copy(LACQUER).lerp(INKS_DARK[bestIdx], s);
+    } else wmTgt[i].copy(LACQUER);
+  }
+}
+addEventListener('resize', measureWordmark);
+
 /* pointer parallax: the camera breathes with the cursor, lerped */
 const ptr = {x:0, y:0, cx:0, cy:0};
 addEventListener('pointermove', e => {
@@ -1052,6 +1131,8 @@ gsap.ticker.add(() => {
   /* collapsed spacing is derived from the frame, not hard-coded: whatever the
      viewport, the neighbours are exactly far enough out to have left it */
   const sep = data.spread + (1 - data.spread) * ((outB + .45) / SPACING);
+  canBoxes.length = 0;
+  camera.updateMatrixWorld();
   cans.forEach((can, i) => {
     const rel = i - data.focus;
     const x = data.x + rel * SPACING * sep;
@@ -1086,6 +1167,13 @@ gsap.ticker.add(() => {
     ao.position.set(x, gy + .004, can.position.z + .02);
     ao.scale.setScalar(s);
     ao.material.opacity = .55 * vis;
+    /* screen box of this can, for the wordmark's per-letter ink */
+    if (vis > .05){
+      projTo(x - CAN_R*s, can.position.y + CAN_TOP*s*.5, can.position.z, _a);
+      projTo(x + CAN_R*s, can.position.y, can.position.z, _b);
+      let top = 0; projTo(x, can.position.y + CAN_TOP*s, can.position.z, PRJ2); top = PRJ2.y;
+      canBoxes.push({i, left:_a.x, right:_b.x, top, bottom:_b.y, vis});
+    }
   });
   ground.position.y = gy;
   mirrorClip.constant = gy;
@@ -1098,6 +1186,12 @@ gsap.ticker.add(() => {
   applyFlavorDOM();
   stage.style.opacity = data.opacity;
   composer.render();
+  inkWordmark();
+  const kl = Math.min(1, dt * 7);
+  wmLetters.forEach((el, i) => {
+    wmCur[i].lerp(wmTgt[i], kl);
+    el.style.color = '#' + wmCur[i].getHexString();
+  });
 });
 addEventListener('resize', () => {
   camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
@@ -1182,6 +1276,10 @@ gsap.timeline({scrollTrigger:{trigger:'#profil', start:'top 96%', end:'top 22%',
   .to(data, {y:-1.5, ease:'power1.in'}, 0)
   .to(data, {opacity:0, ease:'none'}, .45)
   .to(data.bg, {r:.027, g:.027, b:.031, ease:'none'}, 0);
+
+/* the desert scrubs through all eight inks across its own scroll span */
+gsap.fromTo('#profil .eydiw .band', {xPercent:0}, {xPercent:-50, ease:'none',
+  scrollTrigger:{trigger:'#profil .eydi', start:'top bottom', end:'bottom top', scrub:.8}});
 
 /* ---------- seasonal fan (mechanic vendored from 21st.dev card-fan-carousel) ---------- */
 {
@@ -1361,6 +1459,9 @@ gsap.ticker.add(() => {
 
 /* late layout (lazy images, fonts) shifts every trigger's start; refresh once settled */
 addEventListener('load', () => ScrollTrigger.refresh());
+/* the wordmark's letter boxes are only final once Khand has actually loaded */
+document.fonts.ready.then(measureWordmark);
+measureWordmark();
 
 window.__olv = { data, BEERS, lenis, scene, camera, renderer, composer, cans, mirrors, aos,
   ground, glow, materials:{metal, seamM, baseM} };
