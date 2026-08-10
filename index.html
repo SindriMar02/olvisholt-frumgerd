@@ -1281,7 +1281,12 @@ document.getElementById('gamme').appendChild(srList);
 
 const INK_A = new THREE.Color(), INK_B = new THREE.Color(), INK = new THREE.Color();
 const WHITE = new THREE.Color('#ffffff'), BLACK = new THREE.Color('#0C0906');
-let lastIdx = -1;
+let lastIdx = -1, lastInkHex = -1;
+/* Every per-frame style write below is guarded against writing a value the element
+   already has. The scene still computes continuously; only the DOM writes are
+   deduplicated, so nothing moves differently, it just stops re-invalidating style
+   for values that did not change. */
+const panelState = panels.map(() => ({a:-1, y:NaN, v:''}));
 function applyFlavorDOM(){
   const f = Math.max(0, Math.min(BEERS.length - 1, data.focus));
   const i0 = Math.floor(f), i1 = Math.min(BEERS.length - 1, i0 + 1), t = f - i0;
@@ -1290,16 +1295,34 @@ function applyFlavorDOM(){
   const act = 1 - data.spread;
   panels.forEach((el, i) => {
     const d = Math.abs(f - i);
-    const a = Math.max(0, 1 - d * 1.5) * act;
-    el.style.opacity = a;
-    el.style.transform = `translate3d(0,${(f - i) * 30}px,0)`;
-    el.style.visibility = a > .015 ? 'visible' : 'hidden';
+    /* quantised well below perception: 1/1000 opacity, 1/20 px */
+    const a = Math.round(Math.max(0, 1 - d * 1.5) * act * 1000) / 1000;
+    const y = Math.round((f - i) * 600) / 20;
+    const st = panelState[i];
+    if (a !== st.a){
+      el.style.opacity = a; st.a = a;
+      const v = a > .015 ? 'visible' : 'hidden';
+      if (v !== st.v){ el.style.visibility = v; st.v = v; }
+    }
+    if (y !== st.y){ el.style.transform = `translate3d(0,${y}px,0)`; st.y = y; }
   });
 
   /* ink is interpolated, not stepped: the room colour bleeds from one beer to the next */
   INK_A.set(BEERS[i0].ink); INK_B.set(BEERS[i1].ink);
   INK.copy(INK_A).lerp(INK_B, t);
-  document.documentElement.style.setProperty('--ink', '#' + INK.getHexString());
+  /* A custom property set on the ROOT invalidates style for the whole document, and
+     this ran every frame: ~500 elements recalculated per frame, including while parked
+     in a section that has no cans in it. The value is only ever read as an 8-bit hex,
+     so write it only when that hex actually changes. Quantising to a step of 3/255 per
+     channel is invisible on a colour this soft but cuts how often the write fires while
+     the ink is travelling between two beers. */
+  const q = v => Math.min(255, Math.round(v * 255 / 3) * 3);
+  const inkHex = (q(INK.r) << 16) | (q(INK.g) << 8) | q(INK.b);
+  if (inkHex !== lastInkHex){
+    lastInkHex = inkHex;
+    document.documentElement.style.setProperty('--ink',
+      '#' + inkHex.toString(16).padStart(6, '0'));
+  }
   glow.material.color.copy(INK);
   rim.color.copy(INK).lerp(WHITE, .6);
   /* the LAND takes the focused beer's ink as you travel, and returns to gold when the
@@ -1331,6 +1354,8 @@ const LACQUER = new THREE.Color('#F3EADB');
 const INKS_DARK = BEERS.map(b => new THREE.Color(b.ink).multiplyScalar(.55));
 const wmCur = wmLetters.map(() => new THREE.Color('#F3EADB'));
 const wmTgt = wmLetters.map(() => new THREE.Color('#F3EADB'));
+const wmLastHex = wmLetters.map(() => -1);
+let lastStageOp = -1;
 const canBoxes = [];
 const PRJ = new THREE.Vector3();
 const CAN_R = .33, CAN_TOP = 1.15;
@@ -1426,9 +1451,16 @@ gsap.ticker.add(() => {
     can.scale.setScalar(s);
     const bob = Math.sin(t*.55 + i*.9)*.012;
     can.position.set(x, -.57 + yOff + bob, -Math.abs(rel)*.28*data.spread);
-    can.traverse(o => { if (o.isMesh) {
-      o.material.opacity = vis; o.material.transparent = vis < .999;
-      o.castShadow = vis > .6; }});
+    /* traverse() walks the subtree and allocates a closure for every can, every frame.
+       The hierarchy never changes after build, so the mesh list is cached on first use.
+       Identical writes, just without re-walking the tree 8 times a frame. */
+    let cm = can.userData.meshes;
+    if (!cm){ cm = []; can.traverse(o => { if (o.isMesh) cm.push(o); }); can.userData.meshes = cm; }
+    const tr = vis < .999, cs = vis > .6;
+    for (let k = 0; k < cm.length; k++){
+      const m = cm[k].material;
+      m.opacity = vis; m.transparent = tr; cm[k].castShadow = cs;
+    }
     /* exact mirror: reflect the whole world matrix, never the decomposed parts.
        updateMatrixWorld first or we reflect LAST frame's transform (a one-frame lag
        that reads as stutter while the can rotates). */
@@ -1436,10 +1468,14 @@ gsap.ticker.add(() => {
     REFLECT.set(1,0,0,0,  0,-1,0,2*gy,  0,0,1,0,  0,0,0,1);
     mir.matrix.multiplyMatrices(REFLECT, can.matrixWorld);
     mir.matrixWorldNeedsUpdate = true;
-    mir.traverse(o => { if (o.isMesh) {
-      o.material.opacity = vis * .12;
-      const sh = o.material.userData.shader; if (sh) sh.uniforms.uGy.value = gy;
-    }});
+    let mm = mir.userData.meshes;
+    if (!mm){ mm = []; mir.traverse(o => { if (o.isMesh) mm.push(o); }); mir.userData.meshes = mm; }
+    const mo = vis * .12;
+    for (let k = 0; k < mm.length; k++){
+      const m = mm[k].material;
+      m.opacity = mo;
+      const sh = m.userData.shader; if (sh) sh.uniforms.uGy.value = gy;
+    }
     ao.position.set(x, gy + .004, can.position.z + .02);
     ao.scale.setScalar(s);
     ao.material.opacity = .55 * vis;
@@ -1483,13 +1519,16 @@ gsap.ticker.add(() => {
   camera.position.x = ptr.cx * .16;
   camera.position.y = .02 - ptr.cy * .1;
   applyFlavorDOM();
-  stage.style.opacity = vis0;
+  const so = Math.round(vis0 * 1000) / 1000;
+  if (so !== lastStageOp){ stage.style.opacity = so; lastStageOp = so; }
   composer.render();
   inkWordmark();
   const kl = Math.min(1, dt * 7);
   wmLetters.forEach((el, i) => {
     wmCur[i].lerp(wmTgt[i], kl);
-    el.style.color = '#' + wmCur[i].getHexString();
+    /* compare the packed hex, so a settled letter costs no string build and no write */
+    const h = wmCur[i].getHex();
+    if (h !== wmLastHex[i]){ wmLastHex[i] = h; el.style.color = '#' + wmCur[i].getHexString(); }
   });
 });
 addEventListener('resize', () => {
@@ -1829,12 +1868,20 @@ function sizeMerki(){
   r2.setSize(r.width, r.height); cam2.aspect = r.width/r.height; cam2.updateProjectionMatrix();
 }
 sizeMerki(); addEventListener('resize', sizeMerki);
+/* This asked "am I on screen?" with getBoundingClientRect on every single frame, which
+   forces layout every frame for a section that is off screen for most of the page. The
+   profile showed it as the largest real main-thread cost of the scroll. An observer
+   answers the same question for free, and the can now costs literally nothing until it
+   is actually in view. */
+let merkiVis = false;
+new IntersectionObserver(es => { merkiVis = es[0].isIntersecting; },
+  {rootMargin: '10% 0px'}).observe(hold);
 gsap.ticker.add(() => {
+  if (!merkiVis) return;
   const t = (performance.now()-t0)/1000;
   can2.rotation.y = Math.sin(t*.38)*.2;
   can2.rotation.x = Math.sin(t*.27)*.04;
-  const r = hold.getBoundingClientRect();
-  if (r.bottom > 0 && r.top < innerHeight) r2.render(scene2, cam2);
+  r2.render(scene2, cam2);
 });
 
 /* late layout (lazy images, fonts) shifts every trigger's start; refresh once settled */
